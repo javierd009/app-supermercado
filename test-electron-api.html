@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Test Electron API</title>
+  <style>
+    body {
+      font-family: monospace;
+      padding: 20px;
+      background: #1a1a1a;
+      color: #00ff00;
+    }
+    .test {
+      margin: 10px 0;
+      padding: 10px;
+      background: #2a2a2a;
+      border-left: 3px solid #00ff00;
+    }
+    .error {
+      border-left-color: #ff0000;
+      color: #ff0000;
+    }
+    .success {
+      border-left-color: #00ff00;
+      color: #00ff00;
+    }
+    button {
+      padding: 10px 20px;
+      background: #00ff00;
+      color: #000;
+      border: none;
+      cursor: pointer;
+      font-family: monospace;
+      font-size: 16px;
+      margin: 10px 5px;
+    }
+    button:hover {
+      background: #00cc00;
+    }
+    pre {
+      background: #0a0a0a;
+      padding: 10px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 TEST: Electron API</h1>
+
+  <div id="results"></div>
+
+  <button onclick="runTests()">▶️ Ejecutar Tests</button>
+  <button onclick="testLogin()">🔐 Test Login Flow</button>
+
+  <script>
+    const results = document.getElementById('results');
+
+    function log(message, type = 'test') {
+      const div = document.createElement('div');
+      div.className = `test ${type}`;
+      div.innerHTML = message;
+      results.appendChild(div);
+      console.log(message);
+    }
+
+    function runTests() {
+      results.innerHTML = '';
+
+      log('═══════════════════════════════════════════════════', 'test');
+      log('TEST 1: window.electronAPI existe', 'test');
+      log('═══════════════════════════════════════════════════', 'test');
+
+      if (typeof window.electronAPI === 'undefined') {
+        log('❌ window.electronAPI NO EXISTE', 'error');
+        log('Esto significa que el preload script no se ejecutó correctamente', 'error');
+        return;
+      }
+
+      log('✅ window.electronAPI EXISTE', 'success');
+      log('<pre>' + JSON.stringify(Object.keys(window.electronAPI), null, 2) + '</pre>', 'success');
+
+      log('', 'test');
+      log('═══════════════════════════════════════════════════', 'test');
+      log('TEST 2: window.electronAPI.isElectron', 'test');
+      log('═══════════════════════════════════════════════════', 'test');
+
+      if (window.electronAPI.isElectron === true) {
+        log('✅ isElectron = true', 'success');
+      } else {
+        log('❌ isElectron = ' + window.electronAPI.isElectron, 'error');
+      }
+
+      log('', 'test');
+      log('═══════════════════════════════════════════════════', 'test');
+      log('TEST 3: window.electronAPI.db.query', 'test');
+      log('═══════════════════════════════════════════════════', 'test');
+
+      if (typeof window.electronAPI.db.query === 'function') {
+        log('✅ db.query es una función', 'success');
+      } else {
+        log('❌ db.query NO es una función: ' + typeof window.electronAPI.db.query, 'error');
+      }
+
+      log('', 'test');
+      log('═══════════════════════════════════════════════════', 'test');
+      log('TEST 4: Ejecutar query SQL', 'test');
+      log('═══════════════════════════════════════════════════', 'test');
+
+      testQuery();
+    }
+
+    async function testQuery() {
+      try {
+        log('Ejecutando: SELECT * FROM users', 'test');
+
+        const result = await window.electronAPI.db.query('SELECT * FROM users');
+
+        log('✅ Query ejecutada exitosamente', 'success');
+        log('<pre>' + JSON.stringify(result, null, 2) + '</pre>', 'success');
+
+        if (result.success && result.data && result.data.length > 0) {
+          log('✅ Usuarios encontrados: ' + result.data.length, 'success');
+          result.data.forEach((user, i) => {
+            log(`   ${i + 1}. ${user.username} (${user.role})`, 'success');
+          });
+        } else {
+          log('❌ No se encontraron usuarios', 'error');
+        }
+      } catch (error) {
+        log('❌ Error ejecutando query:', 'error');
+        log('<pre>' + error.message + '</pre>', 'error');
+      }
+    }
+
+    async function testLogin() {
+      results.innerHTML = '';
+
+      log('═══════════════════════════════════════════════════', 'test');
+      log('TEST: Login Flow Completo', 'test');
+      log('═══════════════════════════════════════════════════', 'test');
+
+      try {
+        // PASO 1: Verificar que electronAPI existe
+        if (!window.electronAPI || !window.electronAPI.isElectron) {
+          log('❌ ERROR: No estamos en Electron', 'error');
+          return;
+        }
+        log('✅ Estamos en Electron', 'success');
+
+        // PASO 2: Query usuarios
+        log('', 'test');
+        log('Ejecutando: SELECT * FROM users', 'test');
+        const result = await window.electronAPI.db.query('SELECT * FROM users');
+
+        if (!result.success) {
+          log('❌ Query falló: ' + result.error, 'error');
+          return;
+        }
+
+        const users = result.data || [];
+        log(`✅ Query exitosa. Usuarios: ${users.length}`, 'success');
+
+        if (users.length === 0) {
+          log('❌ No hay usuarios en la base de datos', 'error');
+          return;
+        }
+
+        // PASO 3: Intentar login (sin bcrypt, solo verificar que el usuario existe)
+        log('', 'test');
+        log('Usuario encontrado:', 'success');
+        log(`   Username: ${users[0].username}`, 'success');
+        log(`   Role: ${users[0].role}`, 'success');
+        log(`   Password Hash: ${users[0].password_hash.substring(0, 29)}...`, 'success');
+
+        log('', 'test');
+        log('🎉 LOGIN DEBERÍA FUNCIONAR', 'success');
+        log('El usuario existe y la query funciona.', 'success');
+        log('El problema podría estar en bcrypt.compareSync o en la lógica de authService', 'success');
+
+      } catch (error) {
+        log('❌ Error en test de login:', 'error');
+        log('<pre>' + error.message + '\\n' + error.stack + '</pre>', 'error');
+      }
+    }
+
+    // Auto-ejecutar tests al cargar
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(runTests, 500);
+    });
+  </script>
+</body>
+</html>
