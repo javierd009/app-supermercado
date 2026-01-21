@@ -15,8 +15,10 @@ import {
   Trash2,
   ShoppingCart,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Home
 } from 'lucide-react';
+import Link from 'next/link';
 
 interface POSWindowMultiProps {
   windowId: string;
@@ -81,30 +83,38 @@ export function POSWindowMulti({ windowId, onClose }: POSWindowMultiProps) {
 
       {/* Header Minimalista */}
       <div className="bg-white/5 backdrop-blur-3xl border-b border-white/10 shadow-2xl z-20 relative">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+        <div className="px-3 md:px-6 py-3 md:py-4">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 md:gap-4 min-w-0 flex-1">
+              {/* Botón Home en móvil */}
+              <Link
+                href="/dashboard"
+                className="md:hidden flex-shrink-0 p-2 bg-gradient-to-br from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 rounded-xl shadow-lg transition-all"
+              >
+                <Home className="w-4 h-4 text-white" />
+              </Link>
+
               {/* Logo y Título */}
-              <div className="flex items-center gap-3">
-                <div className="bg-gradient-to-br from-blue-600 to-indigo-700 p-2 rounded-xl shadow-lg">
+              <div className="flex items-center gap-2 md:gap-3 min-w-0">
+                <div className="hidden md:block bg-gradient-to-br from-blue-600 to-indigo-700 p-2 rounded-xl shadow-lg flex-shrink-0">
                   <img
                     src="/images/sabrosita-logo.png"
                     alt="La Sabrosita"
                     className="h-6 w-6 object-contain brightness-0 invert"
                   />
                 </div>
-                <div>
-                  <h1 className="text-lg font-black text-white tracking-tight uppercase">
+                <div className="min-w-0">
+                  <h1 className="text-sm md:text-lg font-black text-white tracking-tight uppercase truncate">
                     Punto de Venta
                   </h1>
-                  <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">
+                  <span className="hidden md:block text-[9px] text-slate-500 font-bold uppercase tracking-wider truncate">
                     {user?.username}
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
               {/* Editor de tipo de cambio */}
               <ExchangeRateEditor />
             </div>
@@ -113,11 +123,11 @@ export function POSWindowMulti({ windowId, onClose }: POSWindowMultiProps) {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden relative">
+      <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
         {/* Left Panel - Products & Cart */}
-        <div className="flex-1 flex flex-col p-6 space-y-4 overflow-hidden">
+        <div className="flex-1 flex flex-col p-3 md:p-6 space-y-3 md:space-y-4 overflow-hidden">
           {/* Search Bar & Customer */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-none">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 md:gap-4 flex-none">
             <div className="lg:col-span-8">
               <ProductSearchBar windowId={windowId} />
             </div>
@@ -130,14 +140,58 @@ export function POSWindowMulti({ windowId, onClose }: POSWindowMultiProps) {
           </div>
 
           {/* Cart Table - Envoltorio Moderno */}
-          <div className="flex-1 overflow-hidden bg-white/5 backdrop-blur-3xl rounded-2xl border border-white/10 shadow-2xl flex flex-col relative">
+          <div className="flex-1 overflow-hidden bg-white/5 backdrop-blur-3xl rounded-xl md:rounded-2xl border border-white/10 shadow-2xl flex flex-col relative">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
             <CartTableMulti windowId={windowId} />
           </div>
+
+          {/* Total y botones en móvil - Fixed bottom */}
+          <div className="md:hidden flex-none bg-white/5 backdrop-blur-3xl border-t border-white/10 -mx-3 -mb-3 p-3 space-y-3">
+            {/* Total compacto */}
+            <div className="bg-gradient-to-br from-blue-500/20 to-indigo-500/20 backdrop-blur-xl border border-white/20 rounded-xl p-4 shadow-xl">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Total</p>
+                  <div className="text-2xl font-black tabular-nums text-white">
+                    {formatCurrency(cart.total)}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] text-slate-400">Items</p>
+                  <p className="text-xl font-bold text-white">{cart.items.length}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Botones de acción */}
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={openPaymentModal}
+                disabled={cart.items.length === 0}
+                className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:bg-white/10 disabled:from-white/10 disabled:to-white/10 text-white font-bold py-4 rounded-xl shadow-lg disabled:shadow-none transition-all active:scale-95"
+              >
+                <CreditCard className="w-5 h-5" />
+                <span className="text-sm">COBRAR</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  if (cart.items.length > 0 && confirm('¿Cancelar venta actual?')) {
+                    clearCart();
+                  }
+                }}
+                disabled={cart.items.length === 0}
+                className="flex items-center justify-center gap-2 bg-white/10 hover:bg-rose-500/20 border border-white/20 hover:border-rose-500/50 text-white disabled:text-slate-600 font-bold py-4 rounded-xl transition-all active:scale-95"
+              >
+                <Trash2 className="w-5 h-5" />
+                <span className="text-sm">LIMPIAR</span>
+              </button>
+            </div>
+          </div>
         </div>
 
-        {/* Right Panel - Totals & Actions */}
-        <div className="w-full max-w-[400px] bg-white/5 backdrop-blur-3xl border-l border-white/10 flex flex-col shadow-2xl relative z-10">
+        {/* Right Panel - Totals & Actions - Solo desktop */}
+        <div className="hidden md:flex w-full max-w-[400px] bg-white/5 backdrop-blur-3xl border-l border-white/10 flex-col shadow-2xl relative z-10">
           <div className="p-6 border-b border-white/10">
             <div className="flex items-center gap-2 mb-1">
               <div className="p-1.5 bg-blue-500/20 text-blue-400 rounded-lg backdrop-blur-xl border border-blue-500/30">

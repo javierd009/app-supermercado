@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useWindowManager } from '../store/windowManager';
 import { destroyPOSStore } from '../store/posStoreFactory';
 import { POSWindowMulti } from './POSWindowMulti';
@@ -10,7 +10,7 @@ import Link from 'next/link';
 
 export function POSWindowsManager() {
   const { user } = useAuth();
-  const { windows, activeWindowId, createWindow, closeWindow, setActiveWindow, getWindowsByUser } = useWindowManager();
+  const { createWindow, closeWindow, getWindowsByUser } = useWindowManager();
   const [selectedWindowId, setSelectedWindowId] = useState<string | null>(null);
 
   // Filtrar ventanas solo del usuario actual
@@ -50,10 +50,25 @@ export function POSWindowsManager() {
     });
   };
 
+  // En móvil, crear automáticamente una ventana si no existe ninguna
+  useEffect(() => {
+    if (allWindows.length === 0 && user) {
+      const windowId = createWindow(user.id);
+      setSelectedWindowId(windowId);
+    }
+  }, [allWindows.length, user, createWindow]);
+
+  // En móvil, seleccionar la primera ventana si no hay ninguna seleccionada
+  useEffect(() => {
+    if (!selectedWindowId && allWindows.length > 0) {
+      setSelectedWindowId(allWindows[0].id);
+    }
+  }, [selectedWindowId, allWindows]);
+
   return (
     <div className="flex h-screen bg-[#020617] relative overflow-hidden">
-      {/* Sidebar - Window Selector */}
-      <div className="w-80 bg-white/5 backdrop-blur-3xl border-r border-white/10 flex flex-col relative z-10">
+      {/* Sidebar - Window Selector - Oculto en móvil */}
+      <div className="hidden md:flex w-80 bg-white/5 backdrop-blur-3xl border-r border-white/10 flex-col relative z-10">
         {/* Header */}
         <div className="bg-white/10 border-b border-white/10 px-5 py-4 backdrop-blur-xl">
           <div className="flex items-center gap-3 mb-2">

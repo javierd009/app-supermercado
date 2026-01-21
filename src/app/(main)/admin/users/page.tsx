@@ -38,37 +38,38 @@ export default function UsersManagementPage() {
   return (
     <div className="min-h-screen bg-[#020617] text-slate-200">
       {/* Header */}
-      <header className="h-20 px-6 md:px-8 flex items-center justify-between border-b border-white/5 bg-[#020617]/80 backdrop-blur-xl sticky top-0 z-20">
-        <div className="flex items-center gap-6">
-          <Link href="/dashboard" className="bg-gradient-to-br from-blue-600 to-indigo-700 p-2.5 rounded-xl border border-white/20 shadow-xl hover:scale-105 transition-transform">
-            <Home className="h-5 w-5 text-white" />
+      <header className="min-h-[4.5rem] md:h-20 px-3 md:px-8 flex items-center justify-between border-b border-white/5 bg-[#020617]/80 backdrop-blur-xl sticky top-0 z-20">
+        <div className="flex items-center gap-2 md:gap-6 flex-1 min-w-0">
+          <Link href="/dashboard" className="flex-shrink-0 bg-gradient-to-br from-blue-600 to-indigo-700 p-2 md:p-2.5 rounded-xl border border-white/20 shadow-xl hover:scale-105 transition-transform">
+            <Home className="h-4 w-4 md:h-5 md:w-5 text-white" />
           </Link>
-          <div>
-            <div className="flex items-center gap-2">
-              <Users className="w-5 h-5 text-blue-500" />
-              <p className="text-xl font-black text-white tracking-tight uppercase">Gestión de Usuarios</p>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5 md:gap-2">
+              <Users className="w-4 h-4 md:w-5 md:h-5 text-blue-500 flex-shrink-0" />
+              <p className="text-base md:text-xl font-black text-white tracking-tight uppercase truncate">Gestión de Usuarios</p>
             </div>
-            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Administración de accesos</p>
+            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider hidden sm:block">Administración de accesos</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 md:gap-3 flex-shrink-0">
           <button
             onClick={handleCreateNew}
-            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-6 py-3 rounded-xl text-white font-bold text-sm transition-all flex items-center gap-2 shadow-lg shadow-blue-500/30 uppercase tracking-wide"
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-3 md:px-6 py-2.5 md:py-3 rounded-xl text-white font-bold text-xs md:text-sm transition-all flex items-center gap-1.5 md:gap-2 shadow-lg shadow-blue-500/30 uppercase tracking-wide"
+            title="Crear Usuario"
           >
             <Plus className="w-4 h-4" />
-            Crear Usuario
+            <span className="hidden sm:inline">Crear Usuario</span>
           </button>
 
-          <Link href="/dashboard">
+          <Link href="/dashboard" className="hidden md:block">
             <button className="px-4 py-2 bg-white/5 text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-xl transition-all border border-white/5 flex items-center gap-2">
               <ArrowLeft className="w-4 h-4" />
               <span className="text-xs font-bold uppercase tracking-wide hidden sm:inline">Volver</span>
             </button>
           </Link>
 
-          <Link href="/logout">
+          <Link href="/logout" className="hidden md:block">
             <button className="p-3 bg-white/5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all border border-white/5">
               <LogOut className="w-4 h-4" />
             </button>
