@@ -1,4 +1,5 @@
 import { databaseAdapter } from '@/lib/database';
+import { createClient } from '@/lib/supabase/client';
 import type { BusinessConfig } from '../types';
 
 interface ConfigRow {
@@ -7,6 +8,8 @@ interface ConfigRow {
 }
 
 class ConfigService {
+  private supabase = createClient();
+
   /**
    * Obtener configuración del negocio
    */
@@ -14,10 +17,16 @@ class ConfigService {
     try {
       console.log('[ConfigService] Obteniendo configuración del negocio...');
 
-      const configRows = await databaseAdapter.query<ConfigRow>(
-        `SELECT key, value FROM config
-         WHERE key IN ('business_name', 'business_phone', 'business_address', 'receipt_footer')`
-      );
+      // Usar Supabase directamente para el frontend web
+      const { data, error } = await this.supabase
+        .from('config')
+        .select('key, value')
+        .in('key', ['business_name', 'business_phone', 'business_address', 'receipt_footer']);
+
+      if (error) {
+        console.error('[ConfigService] Error obteniendo configuración:', error);
+        throw error;
+      }
 
       // Convertir array de {key, value} a objeto
       const config: any = {
@@ -27,11 +36,11 @@ class ConfigService {
         receipt_footer: '¡Gracias por su compra!',
       };
 
-      configRows?.forEach((row) => {
+      data?.forEach((row) => {
         config[row.key] = row.value || '';
       });
 
-      console.log('[ConfigService] ✅ Configuración obtenida');
+      console.log('[ConfigService] ✅ Configuración obtenida:', config);
 
       return config as BusinessConfig;
     } catch (error) {
@@ -57,24 +66,17 @@ class ConfigService {
       const entries = Object.entries(updates);
 
       for (const [key, value] of entries) {
-        // Usar UPSERT simulado: primero intentar UPDATE, si no existe hacer INSERT
-        const existing = await databaseAdapter.query<ConfigRow>(
-          'SELECT key FROM config WHERE key = ? LIMIT 1',
-          [key]
-        );
-
-        if (existing && existing.length > 0) {
-          // UPDATE
-          await databaseAdapter.query(
-            'UPDATE config SET value = ? WHERE key = ?',
-            [value || '', key]
+        // Usar upsert de Supabase
+        const { error } = await this.supabase
+          .from('config')
+          .upsert(
+            { key, value: value || '' },
+            { onConflict: 'key' }
           );
-        } else {
-          // INSERT
-          await databaseAdapter.insert('config', {
-            key,
-            value: value || '',
-          });
+
+        if (error) {
+          console.error(`[ConfigService] Error actualizando ${key}:`, error);
+          throw error;
         }
 
         console.log(`[ConfigService] ✅ Config actualizada: ${key} = ${value}`);
@@ -105,14 +107,18 @@ class ConfigService {
    */
   async getConfigValue(key: string): Promise<string | null> {
     try {
-      const result = await databaseAdapter.query<ConfigRow>(
-        'SELECT value FROM config WHERE key = ? LIMIT 1',
-        [key]
-      );
+      const { data, error } = await this.supabase
+        .from('config')
+        .select('value')
+        .eq('key', key)
+        .single();
 
-      if (!result || result.length === 0) return null;
+      if (error || !data) {
+        console.error(`[ConfigService] Get config ${key} error:`, error);
+        return null;
+      }
 
-      return result[0].value;
+      return data.value;
     } catch (error) {
       console.error(`Get config ${key} error:`, error);
       return null;
@@ -124,21 +130,17 @@ class ConfigService {
    */
   async setConfigValue(key: string, value: string): Promise<{ success: boolean; error?: string }> {
     try {
-      // Usar UPSERT simulado: primero intentar UPDATE, si no existe hacer INSERT
-      const existing = await databaseAdapter.query<ConfigRow>(
-        'SELECT key FROM config WHERE key = ? LIMIT 1',
-        [key]
-      );
-
-      if (existing && existing.length > 0) {
-        // UPDATE
-        await databaseAdapter.query(
-          'UPDATE config SET value = ? WHERE key = ?',
-          [value, key]
+      // Usar upsert de Supabase
+      const { error } = await this.supabase
+        .from('config')
+        .upsert(
+          { key, value },
+          { onConflict: 'key' }
         );
-      } else {
-        // INSERT
-        await databaseAdapter.insert('config', { key, value });
+
+      if (error) {
+        console.error(`[ConfigService] Set config ${key} error:`, error);
+        throw error;
       }
 
       console.log(`[ConfigService] ✅ Config establecida: ${key} = ${value}`);

@@ -4,6 +4,7 @@ import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useCashRegister } from '@/features/cash-register/hooks/useCashRegister';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { configService } from '@/features/settings/services/configService';
 import {
   CircleDollarSign,
   Package,
@@ -24,10 +25,22 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const { currentRegister } = useCashRegister();
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [businessName, setBusinessName] = useState('Sabrosita POS');
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    // Cargar nombre del negocio desde configuración
+    const loadBusinessName = async () => {
+      const config = await configService.getBusinessConfig();
+      if (config.business_name) {
+        setBusinessName(config.business_name);
+      }
+    };
+    loadBusinessName();
   }, []);
 
   const menuItems = [
@@ -93,8 +106,8 @@ export default function DashboardPage() {
             <img src="/images/sabrosita-logo.png" alt="logo" className="h-5 w-5 brightness-0 invert" />
           </div>
           <div>
-            <p className="text-xl font-black text-white tracking-tight uppercase">Dashboard</p>
-            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Sistema POS</p>
+            <p className="text-xl font-black text-white tracking-tight uppercase">{businessName}</p>
+            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Dashboard - Sistema POS</p>
           </div>
         </div>
 
@@ -241,9 +254,9 @@ export default function DashboardPage() {
 
       <footer className="py-6 px-8 bg-[#020617]/80 backdrop-blur-xl border-t border-white/5 mt-12">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-lg font-black text-white uppercase tracking-wider">SABROSITA</p>
+          <p className="text-lg font-black text-white uppercase tracking-wider">{businessName}</p>
           <p className="text-[9px] text-slate-600 font-bold uppercase tracking-wide">
-            © 2026 Sabrosita POS v1.0
+            © 2026 {businessName} v1.0
           </p>
         </div>
       </footer>

@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Lock, AlertCircle, LogIn } from 'lucide-react';
 import { useLogin } from '../hooks/useAuth';
+import { configService } from '@/features/settings/services/configService';
 
 export function LoginForm() {
   const router = useRouter();
@@ -12,6 +13,18 @@ export function LoginForm() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [businessName, setBusinessName] = useState('Sabrosita POS');
+
+  useEffect(() => {
+    // Cargar nombre del negocio desde configuración
+    const loadBusinessName = async () => {
+      const config = await configService.getBusinessConfig();
+      if (config.business_name) {
+        setBusinessName(config.business_name);
+      }
+    };
+    loadBusinessName();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,10 +67,10 @@ export function LoginForm() {
       {/* Logo y Título */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl mb-6 shadow-xl border border-white/20">
-          <div className="text-white text-4xl font-black">S</div>
+          <div className="text-white text-4xl font-black">{businessName.charAt(0).toUpperCase()}</div>
         </div>
         <h1 className="text-4xl font-black text-white tracking-tight mb-2 uppercase">
-          Sabrosita POS
+          {businessName}
         </h1>
         <p className="text-slate-500 text-sm font-medium uppercase tracking-wider">
           Sistema de Punto de Venta
@@ -132,7 +145,7 @@ export function LoginForm() {
 
       {/* Footer */}
       <p className="mt-6 text-center text-xs text-slate-600 font-medium uppercase tracking-wide">
-        © 2026 Sabrosita POS v1.0
+        © 2026 {businessName} v1.0
       </p>
     </div>
   );
