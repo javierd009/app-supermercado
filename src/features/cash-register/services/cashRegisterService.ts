@@ -12,11 +12,13 @@ interface CashRegisterRow {
   user_id: string;
   opened_at: string;
   closed_at: string | null;
-  opening_balance: number;
-  closing_balance: number | null;
+  initial_amount: number;
+  final_amount: number | null;
+  expected_amount: number | null;
+  difference: number | null;
   notes: string | null;
   status: string;
-  created_at: string;
+  exchange_rate: number;
 }
 
 interface SaleRow {
@@ -78,10 +80,10 @@ class CashRegisterService {
       const registerData = {
         id: registerId,
         user_id: input.userId,
-        opening_balance: input.initialAmount,
+        initial_amount: input.initialAmount,
+        exchange_rate: input.exchangeRate,
         status: 'open',
         opened_at: now,
-        created_at: now,
       };
 
       await databaseAdapter.insert('cash_registers', registerData);
@@ -93,7 +95,9 @@ class CashRegisterService {
         register: this.mapToCashRegister({
           ...registerData,
           closed_at: null,
-          closing_balance: null,
+          final_amount: null,
+          expected_amount: null,
+          difference: null,
           notes: null,
         }),
       };
@@ -123,7 +127,9 @@ class CashRegisterService {
       // Actualizar caja como cerrada usando databaseAdapter.update
       await databaseAdapter.update('cash_registers', input.registerId, {
         closed_at: now,
-        closing_balance: input.finalAmount,
+        final_amount: input.finalAmount,
+        expected_amount: expectedAmount,
+        difference: difference,
         notes: input.notes || null,
         status: 'closed',
       });
@@ -233,7 +239,6 @@ class CashRegisterService {
 
   /**
    * Mapear datos de DB a CashRegister
-   * NOTA: SQLite usa opening_balance/closing_balance, no initial_amount/final_amount
    */
   private mapToCashRegister(data: CashRegisterRow): CashRegister {
     return {
@@ -241,28 +246,29 @@ class CashRegisterService {
       userId: data.user_id,
       openedAt: data.opened_at,
       closedAt: data.closed_at,
-      initialAmount: parseFloat(String(data.opening_balance)) || 0,
-      finalAmount: data.closing_balance ? parseFloat(String(data.closing_balance)) : null,
-      // NOTA: SQLite no tiene expectedAmount ni difference
-      expectedAmount: null,
-      difference: null,
+      initialAmount: parseFloat(String(data.initial_amount)) || 0,
+      finalAmount: data.final_amount ? parseFloat(String(data.final_amount)) : null,
+      expectedAmount: data.expected_amount ? parseFloat(String(data.expected_amount)) : null,
+      difference: data.difference ? parseFloat(String(data.difference)) : null,
       notes: data.notes,
       status: data.status,
-      exchangeRate: 570, // Valor por defecto (SQLite no tiene exchange_rate)
+      exchangeRate: parseFloat(String(data.exchange_rate)) || 570,
     };
   }
 
   /**
    * Actualizar tipo de cambio de la caja abierta (solo super_admin)
-   * NOTA: SQLite no tiene columna exchange_rate, este método no hace nada en offline
    */
   async updateExchangeRate(
     registerId: string,
     newExchangeRate: number
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      // En SQLite no tenemos exchange_rate, solo logueamos
-      console.warn('[CashRegisterService] updateExchangeRate no implementado en SQLite (solo Supabase)');
+      await databaseAdapter.update('cash_registers', registerId, {
+        exchange_rate: newExchangeRate,
+      });
+
+      console.log('[CashRegisterService] ✅ Tipo de cambio actualizado:', registerId, newExchangeRate);
 
       return { success: true };
     } catch (error: any) {

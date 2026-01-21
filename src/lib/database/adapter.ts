@@ -320,10 +320,11 @@ class DatabaseAdapter {
 
   /**
    * ESQUEMAS VÁLIDOS PARA SQLITE (qué columnas acepta cada tabla)
+   * IMPORTANTE: Deben coincidir EXACTAMENTE con el schema de Supabase
    */
   private readonly sqliteSchemas: Record<string, string[]> = {
-    cash_registers: ['id', 'user_id', 'opened_at', 'closed_at', 'opening_balance', 'closing_balance', 'notes', 'status', 'created_at'],
-    sale_items: ['id', 'sale_id', 'product_id', 'quantity', 'unit_price', 'subtotal', 'tax_rate', 'tax_amount', 'subtotal_before_tax', 'created_at'],
+    cash_registers: ['id', 'user_id', 'opened_at', 'closed_at', 'initial_amount', 'final_amount', 'expected_amount', 'difference', 'notes', 'status', 'exchange_rate'],
+    sale_items: ['id', 'sale_id', 'product_id', 'quantity', 'unit_price', 'subtotal', 'tax_rate', 'tax_amount', 'subtotal_before_tax'],
     config: ['key', 'value', 'description', 'updated_at'],
     products: ['id', 'code', 'name', 'category', 'cost', 'price', 'stock', 'min_stock', 'created_at', 'updated_at', 'tax_rate'],
     sales: ['id', 'cash_register_id', 'user_id', 'total', 'payment_method', 'amount_received', 'change_given', 'created_at', 'subtotal', 'total_tax', 'customer_id', 'payment_currency', 'amount_received_usd', 'exchange_rate_used'],
