@@ -248,7 +248,7 @@ export default function AdminReportsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl lg:text-3xl font-black text-white">Reportes</h1>
-            <p className="text-slate-400 text-sm font-medium mt-1">
+            <p className="text-slate-400 text-base font-medium mt-1">
               Análisis y exportación de datos
             </p>
           </div>
@@ -272,9 +272,9 @@ export default function AdminReportsPage() {
                   isSelected ? 'ring-4 ring-white/30 scale-105' : 'opacity-60 hover:opacity-100'
                 }`}
               >
-                <Icon className="w-8 h-8 text-white mb-3" />
-                <h3 className="text-white font-black text-lg mb-1">{report.name}</h3>
-                <p className="text-white/80 text-xs font-medium">{report.description}</p>
+                <Icon className="w-10 h-10 text-white mb-3" />
+                <h3 className="text-white font-black text-xl mb-1">{report.name}</h3>
+                <p className="text-white/80 text-sm font-medium">{report.description}</p>
               </button>
             );
           })}
@@ -284,17 +284,17 @@ export default function AdminReportsPage() {
         <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
           <div className="flex items-center gap-2 mb-4">
             <Calendar className="w-5 h-5 text-blue-400" />
-            <h3 className="text-white font-black text-lg">Rango de Fechas</h3>
+            <h3 className="text-white font-black text-xl">Rango de Fechas</h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-slate-400 text-sm font-bold uppercase block mb-2">Desde</label>
+              <label className="text-slate-400 text-base font-bold uppercase block mb-2">Desde</label>
               <input
                 type="date"
                 value={dateFrom}
                 onChange={(e) => setDateFrom(e.target.value)}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white font-bold focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-5 py-4 bg-white/10 border border-white/20 rounded-xl text-white text-base font-bold focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -315,18 +315,18 @@ export default function AdminReportsPage() {
           <button
             onClick={generateReport}
             disabled={isLoading}
-            className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-black text-lg py-4 rounded-xl transition-all disabled:opacity-50"
+            className="flex-1 flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-black text-xl py-5 rounded-xl transition-all disabled:opacity-50"
           >
-            <FileText className={`w-5 h-5 ${isLoading ? 'animate-pulse' : ''}`} />
+            <FileText className={`w-6 h-6 ${isLoading ? 'animate-pulse' : ''}`} />
             {isLoading ? 'Generando...' : 'Generar Reporte'}
           </button>
 
           {reportData.length > 0 && (
             <button
               onClick={exportToCSV}
-              className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-black text-lg py-4 px-6 rounded-xl transition-all"
+              className="flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 text-white font-black text-xl py-5 px-6 rounded-xl transition-all"
             >
-              <Download className="w-5 h-5" />
+              <Download className="w-6 h-6" />
               Exportar CSV
             </button>
           )}
@@ -336,8 +336,8 @@ export default function AdminReportsPage() {
         {reportData.length > 0 && (
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-white font-black text-xl">Resultados</h3>
-              <span className="text-slate-400 font-bold text-sm">
+              <h3 className="text-white font-black text-2xl">Resultados</h3>
+              <span className="text-slate-400 font-bold text-base">
                 {reportData.length} registro{reportData.length !== 1 ? 's' : ''}
               </span>
             </div>
@@ -349,7 +349,7 @@ export default function AdminReportsPage() {
                     {Object.keys(reportData[0]).map((key) => (
                       <th
                         key={key}
-                        className="text-left text-slate-400 text-xs font-bold uppercase py-3 px-2"
+                        className="text-left text-slate-400 text-sm font-bold uppercase py-3 px-3"
                       >
                         {key}
                       </th>
@@ -360,7 +360,7 @@ export default function AdminReportsPage() {
                   {reportData.slice(0, 50).map((row, idx) => (
                     <tr key={idx} className="border-b border-white/5 hover:bg-white/5">
                       {Object.entries(row).map(([key, value], cellIdx) => (
-                        <td key={cellIdx} className="text-white text-sm font-medium py-3 px-2">
+                        <td key={cellIdx} className="text-white text-base font-medium py-3 px-3">
                           {typeof value === 'number'
                             ? key.includes('margin') || key.includes('percent')
                               ? `${value.toFixed(1)}%`
@@ -385,7 +385,7 @@ export default function AdminReportsPage() {
               </table>
 
               {reportData.length > 50 && (
-                <p className="text-slate-400 text-sm font-medium text-center mt-4">
+                <p className="text-slate-400 text-base font-medium text-center mt-4">
                   Mostrando los primeros 50 registros de {reportData.length}. Exporta a CSV para ver todos.
                 </p>
               )}
@@ -400,8 +400,8 @@ export default function AdminReportsPage() {
               <FileText className="w-5 h-5 text-white" />
             </div>
             <div className="flex-1">
-              <h4 className="text-white font-bold text-sm mb-2">Exportación de Datos</h4>
-              <ul className="space-y-1 text-blue-200 text-sm font-medium">
+              <h4 className="text-white font-bold text-base mb-2">Exportación de Datos</h4>
+              <ul className="space-y-1 text-blue-200 text-base font-medium">
                 <li>• Los reportes se generan en tiempo real desde Supabase</li>
                 <li>• Puedes exportar a CSV para análisis en Excel</li>
                 <li>• Los datos incluyen todas las transacciones del período seleccionado</li>

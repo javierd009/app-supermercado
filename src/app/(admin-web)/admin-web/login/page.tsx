@@ -92,7 +92,7 @@ export default function AdminWebLoginPage() {
           <h1 className="text-4xl font-black text-white mb-2 tracking-tight">
             SABROSITA
           </h1>
-          <p className="text-blue-200 font-bold text-sm uppercase tracking-wider">
+          <p className="text-blue-200 font-bold text-base uppercase tracking-wider">
             Admin Web · Gestión Remota
           </p>
         </div>
@@ -103,13 +103,13 @@ export default function AdminWebLoginPage() {
             {/* Error Message */}
             {error && (
               <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-4">
-                <p className="text-red-200 text-sm font-medium text-center">{error}</p>
+                <p className="text-red-200 text-base font-medium text-center">{error}</p>
               </div>
             )}
 
             {/* Username */}
             <div>
-              <label className="block text-white font-bold text-sm mb-2 uppercase tracking-wide">
+              <label className="block text-white font-bold text-base mb-2 uppercase tracking-wide">
                 Usuario
               </label>
               <input
@@ -119,13 +119,13 @@ export default function AdminWebLoginPage() {
                 placeholder="ADMIN"
                 required
                 autoFocus
-                className="w-full bg-white/20 border-2 border-white/30 rounded-xl px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:border-white/60 font-bold transition-all"
+                className="w-full bg-white/20 border-2 border-white/30 rounded-xl px-5 py-4 text-white text-lg placeholder:text-white/50 focus:outline-none focus:border-white/60 font-bold transition-all"
               />
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-white font-bold text-sm mb-2 uppercase tracking-wide">
+              <label className="block text-white font-bold text-base mb-2 uppercase tracking-wide">
                 Contraseña
               </label>
               <input
@@ -134,7 +134,7 @@ export default function AdminWebLoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                className="w-full bg-white/20 border-2 border-white/30 rounded-xl px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:border-white/60 font-bold transition-all"
+                className="w-full bg-white/20 border-2 border-white/30 rounded-xl px-5 py-4 text-white text-lg placeholder:text-white/50 focus:outline-none focus:border-white/60 font-bold transition-all"
               />
             </div>
 
@@ -142,7 +142,7 @@ export default function AdminWebLoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-white hover:bg-blue-50 text-blue-900 font-black text-sm uppercase tracking-wide rounded-xl px-6 py-4 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex items-center justify-center gap-2"
+              className="w-full bg-white hover:bg-blue-50 text-blue-900 font-black text-lg uppercase tracking-wide rounded-xl px-6 py-5 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex items-center justify-center gap-2"
             >
               {isLoading ? (
                 <>
@@ -160,10 +160,10 @@ export default function AdminWebLoginPage() {
 
           {/* Info */}
           <div className="mt-6 pt-6 border-t border-white/20">
-            <p className="text-center text-white/70 text-xs font-medium">
+            <p className="text-center text-white/70 text-sm font-medium">
               Solo administradores pueden acceder
             </p>
-            <p className="text-center text-white/50 text-xs mt-1">
+            <p className="text-center text-white/50 text-sm mt-1">
               Contacta al super admin si necesitas acceso
             </p>
           </div>
@@ -171,7 +171,7 @@ export default function AdminWebLoginPage() {
 
         {/* Footer */}
         <div className="mt-8 text-center">
-          <p className="text-white/50 text-xs font-bold uppercase tracking-wider">
+          <p className="text-white/50 text-sm font-bold uppercase tracking-wider">
             © 2026 Sabrosita POS v1.1.0
           </p>
         </div>
