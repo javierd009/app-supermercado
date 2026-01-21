@@ -4,6 +4,12 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { reportsService } from '@/features/reports/services';
+import {
+  getSalesReportAction,
+  getInventoryReportAction,
+  getCustomersReportAction,
+  getFinancialReportAction,
+} from '@/features/reports/actions/reportsActions';
 import type {
   SalesReportRow,
   InventoryReportRow,
@@ -121,23 +127,28 @@ export default function ReportsPage() {
     setReportData([]);
 
     try {
-      let data: ReportData = [];
+      let result;
 
       switch (selectedReport) {
         case 'sales':
-          data = await reportsService.getSalesReport(dateFrom, dateTo);
+          result = await getSalesReportAction(dateFrom, dateTo);
           break;
         case 'inventory':
-          data = await reportsService.getInventoryReport();
+          result = await getInventoryReportAction();
           break;
         case 'customers':
-          data = await reportsService.getCustomersReport(dateFrom, dateTo);
+          result = await getCustomersReportAction(dateFrom, dateTo);
           break;
         case 'financial':
-          data = await reportsService.getFinancialReport(dateFrom, dateTo);
+          result = await getFinancialReportAction(dateFrom, dateTo);
           break;
       }
 
+      if (result && !result.success) {
+        throw new Error(result.error || 'Error al generar reporte');
+      }
+
+      const data = result?.data || [];
       setReportData(data);
       setHasGenerated(true);
 
