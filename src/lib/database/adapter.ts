@@ -49,28 +49,30 @@ class DatabaseAdapter {
       return this.forcedMode;
     }
 
-    // Si modo es 'auto', decidir basado en conexión y disponibilidad
+    // Si modo es 'auto', decidir basado en entorno
     if (this.mode === 'auto') {
       const sqliteAvailable = sqliteClient.isAvailable();
       const isOnline = connectionMonitor.isOnline();
+      // Detectar si estamos en Electron real (app de escritorio)
+      const isElectron = typeof window !== 'undefined' && (window as any).electron?.ipcRenderer;
 
-      console.log('[DatabaseAdapter] getCurrentDatabase() - SQLite disponible:', sqliteAvailable, 'Online:', isOnline);
+      console.log('[DatabaseAdapter] getCurrentDatabase() - SQLite disponible:', sqliteAvailable, 'Online:', isOnline, 'Electron:', !!isElectron);
 
-      // PRIORIDAD 1: Si estamos en Electron, SIEMPRE preferir SQLite
-      // Esto asegura que funcione offline
-      if (sqliteAvailable) {
-        console.log('[DatabaseAdapter] ✅ Eligiendo SQLite (Electron disponible)');
-        return 'sqlite';
-      }
-
-      // PRIORIDAD 2: Si no estamos en Electron pero estamos online, usar Supabase
-      if (isOnline) {
-        console.log('[DatabaseAdapter] Eligiendo Supabase (online, no Electron)');
+      // PRIORIDAD 1: Si estamos en navegador/PWA (NO Electron), SIEMPRE usar Supabase
+      // El frontend web siempre se conecta a la nube
+      if (!isElectron) {
+        console.log('[DatabaseAdapter] ✅ Eligiendo Supabase (Frontend web/PWA - siempre nube)');
         return 'supabase';
       }
 
-      // FALLBACK: Sin Electron y sin conexión - intentar Supabase (fallará)
-      console.warn('[DatabaseAdapter] ⚠️ Sin Electron y sin conexión - intentando Supabase');
+      // PRIORIDAD 2: Si estamos en Electron, usar SQLite para trabajar offline
+      if (sqliteAvailable) {
+        console.log('[DatabaseAdapter] ✅ Eligiendo SQLite (Electron - modo offline)');
+        return 'sqlite';
+      }
+
+      // FALLBACK: Electron sin SQLite - usar Supabase
+      console.warn('[DatabaseAdapter] ⚠️ Electron sin SQLite - intentando Supabase');
       return 'supabase';
     }
 

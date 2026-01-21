@@ -1,4 +1,5 @@
 import { databaseAdapter } from '@/lib/database';
+import { createClient } from '@/lib/supabase/client';
 import type { User, UserRole } from '@/features/auth/types';
 import bcrypt from 'bcryptjs';
 
@@ -13,20 +14,29 @@ interface UserRow {
 }
 
 class UsersService {
+  private supabase = createClient();
+
   /**
    * Listar todos los usuarios
+   * Usa Supabase directamente (frontend web siempre online)
    */
   async listUsers(): Promise<User[]> {
     try {
       console.log('[UsersService] Listando usuarios...');
 
-      const users = await databaseAdapter.query<UserRow>(
-        'SELECT id, username, role, created_at, updated_at FROM users ORDER BY created_at DESC'
-      );
+      const { data, error } = await this.supabase
+        .from('users')
+        .select('id, username, role, created_at, updated_at')
+        .order('created_at', { ascending: false });
 
-      console.log(`[UsersService] ✅ ${users.length} usuarios encontrados`);
+      if (error) {
+        console.error('List users error:', error);
+        return [];
+      }
 
-      return users.map((user) => ({
+      console.log(`[UsersService] ✅ ${data?.length || 0} usuarios encontrados`);
+
+      return (data || []).map((user) => ({
         id: user.id,
         username: user.username,
         role: user.role,
@@ -44,21 +54,23 @@ class UsersService {
    */
   async getUserById(id: string): Promise<User | null> {
     try {
-      const users = await databaseAdapter.query<UserRow>(
-        'SELECT id, username, role, created_at, updated_at FROM users WHERE id = ? LIMIT 1',
-        [id]
-      );
+      const { data, error } = await this.supabase
+        .from('users')
+        .select('id, username, role, created_at, updated_at')
+        .eq('id', id)
+        .single();
 
-      if (!users || users.length === 0) return null;
-
-      const user = users[0];
+      if (error || !data) {
+        console.error('Get user error:', error);
+        return null;
+      }
 
       return {
-        id: user.id,
-        username: user.username,
-        role: user.role,
-        createdAt: user.created_at,
-        updatedAt: user.updated_at,
+        id: data.id,
+        username: data.username,
+        role: data.role,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
       };
     } catch (error) {
       console.error('Get user error:', error);

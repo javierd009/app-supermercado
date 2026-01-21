@@ -1,4 +1,5 @@
 import { databaseAdapter } from '@/lib/database';
+import { createClient } from '@/lib/supabase/client';
 import type { Customer, CreateCustomerInput } from '../types';
 import { GENERIC_CUSTOMER_ID } from '../types';
 import { v4 as uuidv4 } from 'uuid';
@@ -14,20 +15,29 @@ interface CustomerRow {
 }
 
 class CustomersService {
+  private supabase = createClient();
+
   /**
    * Obtener todos los clientes
+   * Usa Supabase directamente (frontend web siempre online)
    */
   async getAll(): Promise<Customer[]> {
     try {
       console.log('[CustomersService] Obteniendo todos los clientes...');
 
-      const customers = await databaseAdapter.query<CustomerRow>(
-        'SELECT id, name, phone, email, address, created_at, updated_at FROM customers ORDER BY name ASC'
-      );
+      const { data, error } = await this.supabase
+        .from('customers')
+        .select('id, name, phone, email, address, created_at, updated_at')
+        .order('name', { ascending: true });
 
-      console.log(`[CustomersService] ✅ ${customers.length} clientes obtenidos`);
+      if (error) {
+        console.error('[CustomersService] Error obteniendo clientes:', error);
+        return [];
+      }
 
-      return customers.map(this.mapToCustomer);
+      console.log(`[CustomersService] ✅ ${data?.length || 0} clientes obtenidos`);
+
+      return (data || []).map(this.mapToCustomer);
     } catch (error: any) {
       console.error('[CustomersService] Error obteniendo clientes:', {
         message: error?.message || 'Unknown error',
@@ -43,14 +53,18 @@ class CustomersService {
    */
   async getGenericCustomer(): Promise<Customer | null> {
     try {
-      const customers = await databaseAdapter.query<CustomerRow>(
-        'SELECT id, name, phone, email, address, created_at, updated_at FROM customers WHERE id = ? LIMIT 1',
-        [GENERIC_CUSTOMER_ID]
-      );
+      const { data, error } = await this.supabase
+        .from('customers')
+        .select('id, name, phone, email, address, created_at, updated_at')
+        .eq('id', GENERIC_CUSTOMER_ID)
+        .single();
 
-      if (!customers || customers.length === 0) return null;
+      if (error || !data) {
+        console.error('Get generic customer error:', error);
+        return null;
+      }
 
-      return this.mapToCustomer(customers[0]);
+      return this.mapToCustomer(data);
     } catch (error) {
       console.error('Get generic customer error:', error);
       return null;

@@ -318,15 +318,20 @@ class SalesService {
 
   /**
    * Obtener ventas recientes (últimas N ventas)
-   * Usa databaseAdapter para funcionar tanto online como offline
+   * Usa Supabase directamente (frontend web siempre online)
    */
   async getRecentSales(limit: number = 50): Promise<Sale[]> {
     try {
-      // Usar databaseAdapter que maneja online/offline automáticamente
-      const data = await databaseAdapter.query<any>(
-        `SELECT * FROM sales ORDER BY created_at DESC LIMIT ?`,
-        [limit]
-      );
+      const { data, error } = await this.supabase
+        .from('sales')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+      if (error) {
+        console.error('Get recent sales error:', error);
+        return [];
+      }
 
       return (data || []).map(this.mapToSale);
     } catch (error) {
