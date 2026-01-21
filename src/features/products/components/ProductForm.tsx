@@ -150,54 +150,54 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
   })();
 
   return (
-    <div className="rounded-2xl bg-white shadow-xl border border-slate-200/60 overflow-hidden">
-      {/* Header mejorado */}
-      <div className="border-b border-slate-200 bg-gradient-to-r from-orange-500 to-orange-600 px-8 py-6">
+    <div className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 overflow-hidden">
+      {/* Header moderno oscuro */}
+      <div className="border-b border-white/10 bg-gradient-to-r from-emerald-600 to-teal-600 px-6 md:px-8 py-5 md:py-6">
         <div className="flex items-center">
-          <div className="rounded-xl bg-white/20 p-3 mr-4">
-            <svg className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="rounded-xl bg-white/20 p-2.5 md:p-3 mr-3 md:mr-4">
+            <svg className="h-5 w-5 md:h-7 md:w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={product ? "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" : "M12 4v16m8-8H4"} />
             </svg>
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-white">
+            <h2 className="text-xl md:text-2xl font-black text-white tracking-tight uppercase">
               {product ? 'Editar Producto' : 'Nuevo Producto'}
             </h2>
-            <p className="text-orange-100 mt-1">
+            <p className="text-xs md:text-sm text-emerald-100 mt-1 font-medium">
               {product ? 'Actualiza la información del producto' : 'Completa la información del nuevo producto'}
             </p>
           </div>
         </div>
       </div>
 
-      <div className="p-8">
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="p-5 md:p-8">
+        <form onSubmit={handleSubmit} className="space-y-5 md:space-y-6">
           {errors.submit && (
-            <div className="rounded-xl bg-gradient-to-r from-red-500 to-red-600 p-4 text-sm text-white shadow-lg shadow-red-500/20">
+            <div className="rounded-xl bg-rose-500/10 border border-rose-500/20 p-4 text-sm text-rose-400">
               <div className="flex items-center">
-                <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-5 w-5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                {errors.submit}
+                <span className="font-medium">{errors.submit}</span>
               </div>
             </div>
           )}
 
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-5 md:gap-6 md:grid-cols-2">
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700">Código *</label>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide">Código *</label>
               <input
                 type="text"
                 placeholder="Ej: 7501055300082"
                 value={formData.code}
                 onChange={(e) => handleChange('code', e.target.value)}
                 disabled={isSubmitting || !!product}
-                className={`w-full rounded-xl border-2 ${
-                  errors.code ? 'border-red-500' : 'border-slate-200'
-                } bg-white px-4 py-3 text-slate-900 placeholder-slate-400 transition-all focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-500/10 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-50`}
+                className={`w-full rounded-xl border ${
+                  errors.code ? 'border-rose-500/50 bg-rose-500/5' : 'border-white/10'
+                } bg-white/5 px-4 py-3 text-white placeholder-slate-500 transition-all focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed`}
               />
               {errors.code && (
-                <p className="text-sm text-red-600">{errors.code}</p>
+                <p className="text-xs text-rose-400 font-medium">{errors.code}</p>
               )}
               {product && (
                 <p className="text-xs text-slate-500">No se puede modificar el código</p>
@@ -208,41 +208,41 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700">Nombre del Producto *</label>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide">Nombre del Producto *</label>
               <input
                 type="text"
                 placeholder="Ej: Coca Cola 500ml"
                 value={formData.name}
                 onChange={(e) => handleChange('name', e.target.value)}
                 disabled={isSubmitting}
-                className={`w-full rounded-xl border-2 ${
-                  errors.name ? 'border-red-500' : 'border-slate-200'
-                } bg-white px-4 py-3 text-slate-900 placeholder-slate-400 transition-all focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-500/10 disabled:opacity-50`}
+                className={`w-full rounded-xl border ${
+                  errors.name ? 'border-rose-500/50 bg-rose-500/5' : 'border-white/10'
+                } bg-white/5 px-4 py-3 text-white placeholder-slate-500 transition-all focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:opacity-50`}
               />
               {errors.name && (
-                <p className="text-sm text-red-600">{errors.name}</p>
+                <p className="text-xs text-rose-400 font-medium">{errors.name}</p>
               )}
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-700">Categoría</label>
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide">Categoría</label>
             <input
               type="text"
               placeholder="Ej: Bebidas"
               value={formData.category}
               onChange={(e) => handleChange('category', e.target.value)}
               disabled={isSubmitting}
-              className="w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 transition-all focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-500/10 disabled:opacity-50"
+              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-slate-500 transition-all focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:opacity-50"
             />
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-5 md:gap-6 md:grid-cols-2">
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700">Costo (₡) *</label>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide">Costo (₡) *</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                  <span className="text-slate-500">₡</span>
+                  <span className="text-emerald-400 font-bold">₡</span>
                 </div>
                 <input
                   type="number"
@@ -251,21 +251,21 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
                   value={formData.cost}
                   onChange={(e) => handleChange('cost', e.target.value)}
                   disabled={isSubmitting}
-                  className={`w-full rounded-xl border-2 ${
-                    errors.cost ? 'border-red-500' : 'border-slate-200'
-                  } bg-white pl-10 pr-4 py-3 text-slate-900 placeholder-slate-400 transition-all focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-500/10 disabled:opacity-50`}
+                  className={`w-full rounded-xl border ${
+                    errors.cost ? 'border-rose-500/50 bg-rose-500/5' : 'border-white/10'
+                  } bg-white/5 pl-10 pr-4 py-3 text-white placeholder-slate-500 transition-all focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:opacity-50`}
                 />
               </div>
               {errors.cost && (
-                <p className="text-sm text-red-600">{errors.cost}</p>
+                <p className="text-xs text-rose-400 font-medium">{errors.cost}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700">Precio de Venta (₡) *</label>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide">Precio de Venta (₡) *</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                  <span className="text-slate-500">₡</span>
+                  <span className="text-emerald-400 font-bold">₡</span>
                 </div>
                 <input
                   type="number"
@@ -274,20 +274,20 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
                   value={formData.price}
                   onChange={(e) => handleChange('price', e.target.value)}
                   disabled={isSubmitting}
-                  className={`w-full rounded-xl border-2 ${
-                    errors.price ? 'border-red-500' : 'border-slate-200'
-                  } bg-white pl-10 pr-4 py-3 text-slate-900 placeholder-slate-400 transition-all focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-500/10 disabled:opacity-50`}
+                  className={`w-full rounded-xl border ${
+                    errors.price ? 'border-rose-500/50 bg-rose-500/5' : 'border-white/10'
+                  } bg-white/5 pl-10 pr-4 py-3 text-white placeholder-slate-500 transition-all focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:opacity-50`}
                 />
               </div>
               {errors.price && (
-                <p className="text-sm text-red-600">{errors.price}</p>
+                <p className="text-xs text-rose-400 font-medium">{errors.price}</p>
               )}
             </div>
           </div>
 
           {/* Selector de Tasa de IVA */}
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-700">Tasa de IVA *</label>
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide">Tasa de IVA *</label>
             <TaxRateSelector
               value={formData.taxRate}
               onChange={(rate) => setFormData({ ...formData, taxRate: rate })}
@@ -297,28 +297,28 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
 
           {/* Modo de cálculo de IVA */}
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-700">Modo de ingreso de precio</label>
-            <div className="grid grid-cols-2 gap-3">
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide">Modo de ingreso de precio</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => setPriceIncludesTax(true)}
-                className={`border-2 p-3 text-left transition-all ${
+                className={`border rounded-xl p-3 md:p-4 text-left transition-all ${
                   priceIncludesTax
-                    ? 'border-green-600 bg-green-50'
-                    : 'border-gray-300 bg-white hover:bg-gray-50'
+                    ? 'border-emerald-500 bg-emerald-500/10'
+                    : 'border-white/10 bg-white/5 hover:bg-white/10'
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-bold text-gray-900 text-sm" style={{ fontFamily: 'Arial, sans-serif' }}>
+                    <p className="font-bold text-white text-sm">
                       Precio INCLUYE IVA
                     </p>
-                    <p className="text-xs text-gray-600 mt-0.5" style={{ fontFamily: 'Arial, sans-serif' }}>
+                    <p className="text-xs text-slate-400 mt-1">
                       Sistema calcula IVA hacia atrás
                     </p>
                   </div>
                   {priceIncludesTax && (
-                    <svg className="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="h-5 w-5 text-emerald-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
                   )}
@@ -327,23 +327,23 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
               <button
                 type="button"
                 onClick={() => setPriceIncludesTax(false)}
-                className={`border-2 p-3 text-left transition-all ${
+                className={`border rounded-xl p-3 md:p-4 text-left transition-all ${
                   !priceIncludesTax
-                    ? 'border-blue-600 bg-blue-50'
-                    : 'border-gray-300 bg-white hover:bg-gray-50'
+                    ? 'border-blue-500 bg-blue-500/10'
+                    : 'border-white/10 bg-white/5 hover:bg-white/10'
                 }`}
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-bold text-gray-900 text-sm" style={{ fontFamily: 'Arial, sans-serif' }}>
+                    <p className="font-bold text-white text-sm">
                       Precio SIN IVA
                     </p>
-                    <p className="text-xs text-gray-600 mt-0.5" style={{ fontFamily: 'Arial, sans-serif' }}>
+                    <p className="text-xs text-slate-400 mt-1">
                       Sistema suma el IVA al precio
                     </p>
                   </div>
                   {!priceIncludesTax && (
-                    <svg className="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="h-5 w-5 text-blue-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
                   )}
@@ -360,41 +360,41 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
               : calculateTaxFromSubtotal(price, formData.taxRate as any);
 
             return (
-              <div className="rounded-xl bg-gradient-to-br from-blue-50 to-blue-100/50 border-2 border-blue-200 p-5">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-bold text-blue-900">Desglose del Precio</h3>
-                  <span className="text-xs font-bold text-blue-700 bg-blue-200 px-2 py-1 rounded">
+              <div className="rounded-xl bg-blue-500/10 border border-blue-500/20 p-4 md:p-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                  <h3 className="text-sm font-bold text-blue-400 uppercase tracking-wide">Desglose del Precio</h3>
+                  <span className="text-[10px] font-bold text-blue-300 bg-blue-500/20 px-2 py-1 rounded w-fit uppercase tracking-wider">
                     {priceIncludesTax ? 'Precio incluye IVA' : 'Precio sin IVA'}
                   </span>
                 </div>
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <p className="text-xs text-blue-700 font-medium mb-1">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+                  <div className="bg-white/5 p-3 rounded-lg">
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wide mb-1.5">
                       {priceIncludesTax ? 'Precio sin IVA' : 'Precio base'}
                     </p>
-                    <p className="text-lg font-bold text-blue-900">
+                    <p className="text-lg md:text-xl font-black text-white tabular-nums">
                       ₡{taxCalc.subtotalBeforeTax.toFixed(2)}
                     </p>
                   </div>
-                  <div>
-                    <p className="text-xs text-blue-700 font-medium mb-1">IVA ({formData.taxRate}%)</p>
-                    <p className="text-lg font-bold text-blue-900">
+                  <div className="bg-white/5 p-3 rounded-lg">
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wide mb-1.5">IVA ({formData.taxRate}%)</p>
+                    <p className="text-lg md:text-xl font-black text-white tabular-nums">
                       ₡{taxCalc.taxAmount.toFixed(2)}
                     </p>
                   </div>
-                  <div>
-                    <p className="text-xs text-blue-700 font-medium mb-1">
+                  <div className="bg-emerald-500/10 border border-emerald-500/30 p-3 rounded-lg">
+                    <p className="text-[10px] text-emerald-400 font-bold uppercase tracking-wide mb-1.5">
                       {priceIncludesTax ? 'Precio ingresado' : 'Precio FINAL'}
                     </p>
-                    <p className="text-lg font-bold text-emerald-600">
+                    <p className="text-lg md:text-xl font-black text-emerald-400 tabular-nums">
                       ₡{taxCalc.total.toFixed(2)}
                     </p>
                   </div>
                 </div>
                 {!priceIncludesTax && (
-                  <div className="mt-3 pt-3 border-t border-blue-300">
-                    <p className="text-xs text-blue-700">
-                      💡 <strong>Precio de venta final:</strong> El cliente pagará ₡{taxCalc.total.toFixed(2)} (₡{price.toFixed(2)} + ₡{taxCalc.taxAmount.toFixed(2)} IVA)
+                  <div className="mt-3 pt-3 border-t border-blue-500/20">
+                    <p className="text-xs text-slate-300 font-medium">
+                      💡 <strong className="text-blue-300">Precio de venta final:</strong> El cliente pagará ₡{taxCalc.total.toFixed(2)} (₡{price.toFixed(2)} + ₡{taxCalc.taxAmount.toFixed(2)} IVA)
                     </p>
                   </div>
                 )}
@@ -404,42 +404,42 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
 
           {/* Indicador de margen mejorado */}
           {margin > 0 && (
-            <div className={`rounded-xl p-4 ${
+            <div className={`rounded-xl p-4 border ${
               margin > 50
-                ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200'
+                ? 'bg-emerald-500/10 border-emerald-500/30'
                 : margin > 30
-                ? 'bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-200'
-                : 'bg-gradient-to-r from-slate-50 to-gray-50 border-2 border-slate-200'
+                ? 'bg-blue-500/10 border-blue-500/30'
+                : 'bg-slate-500/10 border-slate-500/30'
             }`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <div className={`rounded-lg p-2 mr-3 ${
-                    margin > 50 ? 'bg-green-500' : margin > 30 ? 'bg-blue-500' : 'bg-slate-500'
+                    margin > 50 ? 'bg-emerald-500' : margin > 30 ? 'bg-blue-500' : 'bg-slate-500'
                   }`}>
                     <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                     </svg>
                   </div>
                   <div>
-                    <p className={`text-sm font-medium ${
-                      margin > 50 ? 'text-green-700' : margin > 30 ? 'text-blue-700' : 'text-slate-700'
+                    <p className={`text-xs font-bold uppercase tracking-wide ${
+                      margin > 50 ? 'text-emerald-400' : margin > 30 ? 'text-blue-400' : 'text-slate-400'
                     }`}>
                       Margen de ganancia
                     </p>
-                    <p className={`text-2xl font-bold ${
-                      margin > 50 ? 'text-green-600' : margin > 30 ? 'text-blue-600' : 'text-slate-600'
+                    <p className={`text-2xl md:text-3xl font-black tabular-nums ${
+                      margin > 50 ? 'text-emerald-400' : margin > 30 ? 'text-blue-400' : 'text-slate-400'
                     }`}>
                       {margin.toFixed(1)}%
                     </p>
                   </div>
                 </div>
                 {margin > 50 && (
-                  <span className="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-700">
+                  <span className="inline-flex items-center rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-bold text-emerald-300 uppercase tracking-wide">
                     Excelente
                   </span>
                 )}
                 {margin > 30 && margin <= 50 && (
-                  <span className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">
+                  <span className="inline-flex items-center rounded-full bg-blue-500/20 px-3 py-1 text-xs font-bold text-blue-300 uppercase tracking-wide">
                     Bueno
                   </span>
                 )}
@@ -447,54 +447,54 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
             </div>
           )}
 
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-5 md:gap-6 md:grid-cols-2">
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700">Stock Inicial *</label>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide">Stock Inicial *</label>
               <input
                 type="number"
                 placeholder="0"
                 value={formData.stock}
                 onChange={(e) => handleChange('stock', e.target.value)}
                 disabled={isSubmitting}
-                className={`w-full rounded-xl border-2 ${
-                  errors.stock ? 'border-red-500' : 'border-slate-200'
-                } bg-white px-4 py-3 text-slate-900 placeholder-slate-400 transition-all focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-500/10 disabled:opacity-50`}
+                className={`w-full rounded-xl border ${
+                  errors.stock ? 'border-rose-500/50 bg-rose-500/5' : 'border-white/10'
+                } bg-white/5 px-4 py-3 text-white placeholder-slate-500 transition-all focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:opacity-50`}
               />
               {errors.stock && (
-                <p className="text-sm text-red-600">{errors.stock}</p>
+                <p className="text-xs text-rose-400 font-medium">{errors.stock}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700">Stock Mínimo (Alerta)</label>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide">Stock Mínimo (Alerta)</label>
               <input
                 type="number"
                 placeholder="10"
                 value={formData.minStock}
                 onChange={(e) => handleChange('minStock', e.target.value)}
                 disabled={isSubmitting}
-                className="w-full rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 transition-all focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-500/10 disabled:opacity-50"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-slate-500 transition-all focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:opacity-50"
               />
               <p className="text-xs text-slate-500">Se alertará cuando el stock baje de este número</p>
             </div>
           </div>
 
-          <div className="flex justify-end space-x-3 pt-6 border-t border-slate-200">
+          <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-white/10">
             <button
               type="button"
               onClick={onCancel}
               disabled={isSubmitting}
-              className="rounded-xl bg-white px-6 py-3 font-semibold text-slate-700 border-2 border-slate-200 transition-all hover:border-slate-300 hover:bg-slate-50 disabled:opacity-50"
+              className="w-full sm:w-auto rounded-xl bg-white/5 px-6 py-3 font-bold text-white border border-white/10 transition-all hover:bg-white/10 hover:border-white/20 disabled:opacity-50 uppercase tracking-wide"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-3 font-semibold text-white shadow-lg shadow-orange-500/30 transition-all hover:shadow-xl hover:shadow-orange-500/40 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
+              className="w-full sm:w-auto rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-3 font-bold text-white shadow-lg shadow-emerald-500/20 transition-all hover:shadow-xl hover:shadow-emerald-500/30 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none uppercase tracking-wide"
             >
               {isSubmitting ? (
-                <span className="flex items-center">
+                <span className="flex items-center justify-center">
                   <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
