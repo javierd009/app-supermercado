@@ -38,6 +38,8 @@ export default function SalesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [paymentFilter, setPaymentFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -168,7 +170,23 @@ export default function SalesPage() {
       (statusFilter === 'active' && !sale.canceledAt) ||
       (statusFilter === 'canceled' && sale.canceledAt);
 
-    return matchesSearch && matchesPayment && matchesStatus;
+    // Filtro por fechas
+    let matchesDateRange = true;
+    if (startDate || endDate) {
+      const saleDate = new Date(sale.createdAt);
+      if (startDate) {
+        const start = new Date(startDate);
+        start.setHours(0, 0, 0, 0);
+        matchesDateRange = matchesDateRange && saleDate >= start;
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        matchesDateRange = matchesDateRange && saleDate <= end;
+      }
+    }
+
+    return matchesSearch && matchesPayment && matchesStatus && matchesDateRange;
   });
 
   const activeSales = filteredSales.filter(s => !s.canceledAt);
@@ -307,9 +325,9 @@ export default function SalesPage() {
               Filtros y Búsqueda
             </h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {/* Búsqueda */}
-            <div>
+            <div className="lg:col-span-1">
               <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">
                 Buscar por Cliente o ID
               </label>
@@ -325,6 +343,32 @@ export default function SalesPage() {
                   className="w-full bg-white/10 border border-white/20 rounded-xl pl-10 pr-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                 />
               </div>
+            </div>
+
+            {/* Filtro por fecha inicio */}
+            <div>
+              <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">
+                Desde
+              </label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all [color-scheme:dark]"
+              />
+            </div>
+
+            {/* Filtro por fecha fin */}
+            <div>
+              <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">
+                Hasta
+              </label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all [color-scheme:dark]"
+              />
             </div>
 
             {/* Filtro por método de pago */}
@@ -425,7 +469,7 @@ export default function SalesPage() {
                           <Receipt className="w-12 h-12 text-slate-600 mx-auto" />
                         </div>
                         <p className="text-sm font-black text-white uppercase tracking-wide">
-                          {searchTerm || paymentFilter !== 'all' || statusFilter !== 'all' ? 'No se encontraron ventas con los filtros aplicados' : 'No hay ventas registradas'}
+                          {searchTerm || paymentFilter !== 'all' || statusFilter !== 'all' || startDate || endDate ? 'No se encontraron ventas con los filtros aplicados' : 'No hay ventas registradas'}
                         </p>
                       </div>
                     </td>
@@ -501,7 +545,7 @@ export default function SalesPage() {
             <div className="flex items-center justify-between text-xs">
               <span className="font-medium text-slate-400">
                 REGISTRO TOTAL: <span className="text-blue-400 font-black">{filteredSales.length}</span> VENTA{filteredSales.length !== 1 ? 'S' : ''}
-                {(searchTerm || paymentFilter !== 'all' || statusFilter !== 'all') && (
+                {(searchTerm || paymentFilter !== 'all' || statusFilter !== 'all' || startDate || endDate) && (
                   <span className="ml-2 text-blue-400 font-black">
                     (FILTRADO DE {sales.length})
                   </span>

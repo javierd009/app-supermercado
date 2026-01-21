@@ -20,21 +20,21 @@ export default function AdminPage() {
       href: '/admin/users',
       icon: <Users className="w-5 h-5" />,
       description: 'Crear, editar y administrar usuarios del sistema',
-      gradient: 'from-blue-500 to-indigo-600',
+      gradient: 'from-purple-500 to-purple-600',
     },
     {
       title: 'Configuración del Negocio',
       href: '/admin/settings',
       icon: <Settings className="w-5 h-5" />,
       description: 'Editar información y parámetros del sistema',
-      gradient: 'from-blue-500 to-indigo-600',
+      gradient: 'from-cyan-500 to-blue-600',
     },
     {
       title: 'Impresión y Tickets',
       href: '/admin/printing',
       icon: <Printer className="w-5 h-5" />,
       description: 'Reimprimir tickets y pruebas de impresión',
-      gradient: 'from-blue-500 to-indigo-600',
+      gradient: 'from-orange-500 to-amber-600',
     },
     {
       title: 'Reportes de IVA',
@@ -114,15 +114,15 @@ export default function AdminPage() {
           </div>
 
           <div className="bg-white/5 p-5 rounded-xl border border-white/5 hover:bg-white/[0.08] transition-all">
-            <div className="p-3 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-lg text-white shadow-lg mb-4 inline-flex">
+            <div className="p-3 bg-gradient-to-tr from-amber-500 to-orange-600 rounded-lg text-white shadow-lg mb-4 inline-flex">
               <Shield className="w-4 h-4" />
             </div>
             <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wide mb-2">Seguridad</p>
-            <h3 className="text-xl font-black text-blue-400">Alta</h3>
+            <h3 className="text-xl font-black text-amber-400">Alta</h3>
           </div>
 
           <div className="bg-white/5 p-5 rounded-xl border border-white/5 hover:bg-white/[0.08] transition-all">
-            <div className="p-3 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-lg text-white shadow-lg mb-4 inline-flex">
+            <div className="p-3 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-lg text-white shadow-lg mb-4 inline-flex">
               <Clock className="w-4 h-4" />
             </div>
             <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wide mb-2">Último Acceso</p>
