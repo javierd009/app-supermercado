@@ -59,8 +59,8 @@ export default function AdminWebProtectedLayout({
               <Smartphone className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-white font-black text-sm">SABROSITA</h1>
-              <p className="text-blue-400 text-xs font-bold">Admin Web</p>
+              <h1 className="text-white font-black text-base">SABROSITA</h1>
+              <p className="text-blue-400 text-sm font-bold">Admin Web</p>
             </div>
           </div>
           <button
@@ -82,8 +82,8 @@ export default function AdminWebProtectedLayout({
                 <Smartphone className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-white font-black text-lg">SABROSITA</h1>
-                <p className="text-blue-400 text-xs font-bold uppercase">Admin Web</p>
+                <h1 className="text-white font-black text-xl">SABROSITA</h1>
+                <p className="text-blue-400 text-sm font-bold uppercase">Admin Web</p>
               </div>
             </div>
           </div>
@@ -98,7 +98,7 @@ export default function AdminWebProtectedLayout({
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all ${
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-base transition-all ${
                     isActive
                       ? 'bg-blue-600 text-white'
                       : 'text-slate-400 hover:bg-white/5 hover:text-white'
@@ -114,14 +114,14 @@ export default function AdminWebProtectedLayout({
           {/* User Info & Logout */}
           <div className="p-4 border-t border-white/10">
             <div className="bg-white/5 rounded-xl p-4 mb-3">
-              <p className="text-white font-bold text-sm">{user.username}</p>
-              <p className="text-blue-400 text-xs font-medium uppercase mt-1">
+              <p className="text-white font-bold text-base">{user.username}</p>
+              <p className="text-blue-400 text-sm font-medium uppercase mt-1">
                 {user.role === 'super_admin' ? 'Super Admin' : 'Admin'}
               </p>
             </div>
             <button
               onClick={logout}
-              className="w-full flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold text-sm px-4 py-3 rounded-xl transition-all"
+              className="w-full flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold text-base px-4 py-3 rounded-xl transition-all"
             >
               <LogOut className="w-4 h-4" />
               Cerrar Sesión
@@ -145,7 +145,7 @@ export default function AdminWebProtectedLayout({
             <Link
               key={item.name}
               href={item.href}
-              className={`flex flex-col items-center gap-1 px-2 py-2 rounded-xl font-bold text-xs transition-all ${
+              className={`flex flex-col items-center gap-1 px-2 py-2 rounded-xl font-bold text-sm transition-all ${
                 isActive
                   ? 'bg-blue-600 text-white'
                   : 'text-slate-400'
