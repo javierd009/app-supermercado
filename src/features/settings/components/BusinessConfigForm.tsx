@@ -125,16 +125,16 @@ export function BusinessConfigForm() {
 
       {/* Formulario */}
       <div className="rounded-2xl bg-white/5 border border-white/10 overflow-hidden">
-        <div className="border-b border-white/10 bg-gradient-to-r from-blue-600 to-indigo-700 px-8 py-6">
-          <h2 className="text-2xl font-bold text-white uppercase tracking-tight">
+        <div className="border-b border-white/10 bg-gradient-to-r from-blue-600 to-indigo-700 px-5 md:px-8 py-5 md:py-6">
+          <h2 className="text-xl md:text-2xl font-bold text-white uppercase tracking-tight">
             Configuración del Negocio
           </h2>
-          <p className="text-blue-100 text-sm mt-1">
+          <p className="text-blue-100 text-xs md:text-sm mt-1">
             Estos datos aparecerán en los tickets impresos
           </p>
         </div>
 
-        <div className="p-8 space-y-6">
+        <div className="p-5 md:p-8 space-y-5 md:space-y-6">
           {/* Nombre del Negocio */}
           <div>
             <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">
@@ -227,11 +227,11 @@ export function BusinessConfigForm() {
           </div>
 
           {/* Botones de acción */}
-          <div className="flex space-x-3 pt-4 border-t border-white/10">
+          <div className="flex flex-col md:flex-row gap-3 pt-4 border-t border-white/10">
             <button
               type="submit"
               disabled={isSaving}
-              className="flex-1 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-6 py-4 font-bold text-white shadow-lg shadow-blue-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wide"
+              className="w-full md:flex-1 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 px-4 md:px-6 py-3 md:py-4 text-sm md:text-base font-bold text-white shadow-lg shadow-blue-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wide"
             >
               {isSaving ? 'GUARDANDO...' : 'Guardar Configuración'}
             </button>
@@ -239,7 +239,7 @@ export function BusinessConfigForm() {
             <button
               type="button"
               onClick={handleTestPrint}
-              className="rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 px-6 py-4 font-bold text-white transition-all uppercase tracking-wide"
+              className="w-full md:w-auto rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 px-4 md:px-6 py-3 md:py-4 text-sm md:text-base font-bold text-white transition-all uppercase tracking-wide"
             >
               Imprimir Prueba
             </button>

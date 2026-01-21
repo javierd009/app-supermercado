@@ -150,63 +150,66 @@ export default function ProductsPage() {
       </header>
 
       {/* Action Bar */}
-      <div className="px-6 md:px-8 py-4 border-b border-white/5 bg-white/5 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          {view !== 'list' && (
-            <button
-              onClick={handleCancel}
-              className="bg-slate-600 hover:bg-slate-700 px-4 py-2 rounded-xl text-white font-bold text-xs uppercase tracking-wide transition-all flex items-center gap-2"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              Volver
-            </button>
-          )}
-        </div>
-
-        {view === 'list' && (
+      <div className="px-4 md:px-8 py-3 md:py-4 border-b border-white/5 bg-white/5">
+        <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <button
-              onClick={handleExportCSV}
-              className="bg-white/5 hover:bg-emerald-500/20 px-4 py-2 rounded-xl text-emerald-400 font-bold text-xs uppercase tracking-wide transition-all border border-white/5 flex items-center gap-2"
-            >
-              <FileSpreadsheet className="w-3.5 h-3.5" />
-              CSV
-            </button>
-            <button
-              onClick={handleExportPDF}
-              className="bg-white/5 hover:bg-rose-500/20 px-4 py-2 rounded-xl text-rose-400 font-bold text-xs uppercase tracking-wide transition-all border border-white/5 flex items-center gap-2"
-            >
-              <FileText className="w-3.5 h-3.5" />
-              PDF
-            </button>
-            <button
-              onClick={handlePrintBarcodes}
-              className="bg-white/5 hover:bg-amber-500/20 px-4 py-2 rounded-xl text-amber-400 font-bold text-xs uppercase tracking-wide transition-all border border-white/5 flex items-center gap-2"
-            >
-              <Barcode className="w-3.5 h-3.5" />
-              Códigos
-            </button>
-
-            {(user?.role === 'admin' || user?.role === 'super_admin') && (
-              <>
-                <button
-                  onClick={handleImport}
-                  className="bg-amber-600 hover:bg-amber-700 px-4 py-2 rounded-xl text-white font-bold text-xs uppercase tracking-wide transition-all flex items-center gap-2"
-                >
-                  <Upload className="w-3.5 h-3.5" />
-                  Importar
-                </button>
-                <button
-                  onClick={handleCreate}
-                  className="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-xl text-white font-bold text-xs uppercase tracking-wide transition-all flex items-center gap-2"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  Nuevo
-                </button>
-              </>
+            {view !== 'list' && (
+              <button
+                onClick={handleCancel}
+                className="bg-slate-600 hover:bg-slate-700 px-3 md:px-4 py-2.5 md:py-2 rounded-xl text-white font-bold text-sm md:text-xs uppercase tracking-wide transition-all flex items-center gap-1.5 md:gap-2"
+              >
+                <ArrowLeft className="w-4 h-4 md:w-3.5 md:h-3.5" />
+                <span>Volver</span>
+              </button>
             )}
           </div>
-        )}
+
+          {view === 'list' && (
+            <div className="flex items-center gap-1.5 md:gap-2 flex-wrap justify-end">
+              {/* Botones de exportación - solo iconos en mobile */}
+              <button
+                onClick={handleExportCSV}
+                className="bg-white/5 hover:bg-emerald-500/20 px-2.5 md:px-4 py-2.5 md:py-2 rounded-xl text-emerald-400 font-bold text-xs uppercase tracking-wide transition-all border border-white/5 flex items-center gap-1.5 md:gap-2"
+              >
+                <FileSpreadsheet className="w-4 h-4 md:w-3.5 md:h-3.5" />
+                <span className="hidden sm:inline">CSV</span>
+              </button>
+              <button
+                onClick={handleExportPDF}
+                className="bg-white/5 hover:bg-rose-500/20 px-2.5 md:px-4 py-2.5 md:py-2 rounded-xl text-rose-400 font-bold text-xs uppercase tracking-wide transition-all border border-white/5 flex items-center gap-1.5 md:gap-2"
+              >
+                <FileText className="w-4 h-4 md:w-3.5 md:h-3.5" />
+                <span className="hidden sm:inline">PDF</span>
+              </button>
+              <button
+                onClick={handlePrintBarcodes}
+                className="bg-white/5 hover:bg-amber-500/20 px-2.5 md:px-4 py-2.5 md:py-2 rounded-xl text-amber-400 font-bold text-xs uppercase tracking-wide transition-all border border-white/5 flex items-center gap-1.5 md:gap-2"
+              >
+                <Barcode className="w-4 h-4 md:w-3.5 md:h-3.5" />
+                <span className="hidden sm:inline">Códigos</span>
+              </button>
+
+              {(user?.role === 'admin' || user?.role === 'super_admin') && (
+                <>
+                  <button
+                    onClick={handleImport}
+                    className="bg-amber-600 hover:bg-amber-700 px-3 md:px-4 py-2.5 md:py-2 rounded-xl text-white font-bold text-sm md:text-xs uppercase tracking-wide transition-all flex items-center gap-1.5 md:gap-2"
+                  >
+                    <Upload className="w-4 h-4 md:w-3.5 md:h-3.5" />
+                    <span>Importar</span>
+                  </button>
+                  <button
+                    onClick={handleCreate}
+                    className="bg-emerald-600 hover:bg-emerald-700 px-3 md:px-4 py-2.5 md:py-2 rounded-xl text-white font-bold text-sm md:text-xs uppercase tracking-wide transition-all flex items-center gap-1.5 md:gap-2"
+                  >
+                    <Plus className="w-4 h-4 md:w-3.5 md:h-3.5" />
+                    <span>Nuevo</span>
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       <main className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto">

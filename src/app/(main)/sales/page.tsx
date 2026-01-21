@@ -184,22 +184,22 @@ export default function SalesPage() {
   return (
     <div className="min-h-screen bg-[#020617] text-slate-200">
       {/* Header */}
-      <header className="h-20 px-6 md:px-8 flex items-center justify-between border-b border-white/5 bg-[#020617]/80 backdrop-blur-xl sticky top-0 z-20">
-        <div className="flex items-center gap-6">
-          <a href="/dashboard" className="bg-gradient-to-br from-blue-600 to-indigo-700 p-2.5 rounded-xl border border-white/20 shadow-xl hover:scale-105 transition-transform">
-            <Home className="h-5 w-5 text-white" />
+      <header className="min-h-[4.5rem] md:h-20 px-3 md:px-8 flex items-center justify-between border-b border-white/5 bg-[#020617]/80 backdrop-blur-xl sticky top-0 z-20">
+        <div className="flex items-center gap-2 md:gap-6 flex-1 min-w-0">
+          <a href="/dashboard" className="bg-gradient-to-br from-blue-600 to-indigo-700 p-2 md:p-2.5 rounded-xl border border-white/20 shadow-xl hover:scale-105 transition-transform flex-shrink-0">
+            <Home className="h-4 w-4 md:h-5 md:w-5 text-white" />
           </a>
-          <div>
-            <div className="flex items-center gap-2">
-              <Receipt className="w-5 h-5 text-blue-500" />
-              <p className="text-xl font-black text-white tracking-tight uppercase">Historial de Ventas</p>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5 md:gap-2">
+              <Receipt className="w-4 h-4 md:w-5 md:h-5 text-blue-500 flex-shrink-0" />
+              <p className="text-base md:text-xl font-black text-white tracking-tight uppercase truncate">Historial de Ventas</p>
             </div>
-            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Gestión y análisis de ventas</p>
+            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider hidden sm:block">Gestión y análisis de ventas</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-6">
-          <div className="hidden md:flex flex-col items-end">
+        <div className="flex items-center gap-2 md:gap-6 flex-shrink-0">
+          <div className="hidden lg:flex flex-col items-end">
             <div className="flex items-center gap-2">
               <Clock className="w-3.5 h-3.5 text-blue-500" />
               <p className="text-lg font-bold text-white tabular-nums">{currentTime.toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}</p>
@@ -207,27 +207,31 @@ export default function SalesPage() {
             <p className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">{currentTime.toLocaleDateString('es-CR', { weekday: 'short', day: '2-digit', month: 'short' })}</p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 md:gap-2">
+            {/* Botones de exportación - solo iconos en mobile */}
             <button
               onClick={handleExportCSV}
-              className="bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-2 rounded-xl text-blue-400 font-bold text-xs uppercase tracking-wide transition-all flex items-center gap-1.5"
+              className="bg-white/5 hover:bg-white/10 border border-white/10 px-2 md:px-3 py-2 md:py-2.5 rounded-lg md:rounded-xl text-blue-400 font-bold text-xs uppercase tracking-wide transition-all flex items-center gap-1.5"
+              title="Exportar a CSV"
             >
-              <FileSpreadsheet className="w-3.5 h-3.5" />
-              CSV
+              <FileSpreadsheet className="w-4 h-4 md:w-3.5 md:h-3.5" />
+              <span className="hidden sm:inline">CSV</span>
             </button>
             <button
               onClick={handleExportPDF}
-              className="bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-2 rounded-xl text-blue-400 font-bold text-xs uppercase tracking-wide transition-all flex items-center gap-1.5"
+              className="bg-white/5 hover:bg-white/10 border border-white/10 px-2 md:px-3 py-2 md:py-2.5 rounded-lg md:rounded-xl text-blue-400 font-bold text-xs uppercase tracking-wide transition-all flex items-center gap-1.5"
+              title="Exportar a PDF"
             >
-              <FileText className="w-3.5 h-3.5" />
-              PDF
+              <FileText className="w-4 h-4 md:w-3.5 md:h-3.5" />
+              <span className="hidden sm:inline">PDF</span>
             </button>
             <button
               onClick={loadData}
-              className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-xl text-white font-bold text-xs uppercase tracking-wide transition-all flex items-center gap-1.5"
+              className="bg-blue-600 hover:bg-blue-700 px-3 md:px-4 py-2 md:py-2.5 rounded-lg md:rounded-xl text-white font-bold text-xs md:text-sm uppercase tracking-wide transition-all flex items-center gap-1.5"
+              title="Actualizar datos"
             >
-              <RefreshCw className="w-3.5 h-3.5" />
-              Actualizar
+              <RefreshCw className="w-4 h-4 md:w-3.5 md:h-3.5" />
+              <span className="hidden sm:inline">Actualizar</span>
             </button>
           </div>
         </div>

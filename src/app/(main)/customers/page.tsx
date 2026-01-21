@@ -135,22 +135,22 @@ export default function CustomersPage() {
   return (
     <div className="min-h-screen bg-[#020617] text-slate-200">
       {/* Header */}
-      <header className="h-20 px-6 md:px-8 flex items-center justify-between border-b border-white/5 bg-[#020617]/80 backdrop-blur-xl sticky top-0 z-20">
-        <div className="flex items-center gap-6">
-          <Link href="/dashboard" className="bg-gradient-to-br from-blue-600 to-indigo-700 p-2.5 rounded-xl border border-white/20 shadow-xl hover:scale-105 transition-transform">
-            <Home className="h-5 w-5 text-white" />
+      <header className="min-h-[4.5rem] md:h-20 px-3 md:px-8 flex items-center justify-between border-b border-white/5 bg-[#020617]/80 backdrop-blur-xl sticky top-0 z-20">
+        <div className="flex items-center gap-2 md:gap-6 flex-1 min-w-0">
+          <Link href="/dashboard" className="bg-gradient-to-br from-blue-600 to-indigo-700 p-2 md:p-2.5 rounded-xl border border-white/20 shadow-xl hover:scale-105 transition-transform flex-shrink-0">
+            <Home className="h-4 w-4 md:h-5 md:w-5 text-white" />
           </Link>
-          <div>
-            <div className="flex items-center gap-2">
-              <Users className="w-5 h-5 text-blue-500" />
-              <p className="text-xl font-black text-white tracking-tight uppercase">Gestión de Clientes</p>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5 md:gap-2">
+              <Users className="w-4 h-4 md:w-5 md:h-5 text-purple-500 flex-shrink-0" />
+              <p className="text-base md:text-xl font-black text-white tracking-tight uppercase truncate">Gestión de Clientes</p>
             </div>
-            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Registro y administración</p>
+            <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider hidden sm:block">Registro y administración</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-6">
-          <div className="hidden md:flex flex-col items-end">
+        <div className="flex items-center gap-2 md:gap-6 flex-shrink-0">
+          <div className="hidden lg:flex flex-col items-end">
             <div className="flex items-center gap-2">
               <Clock className="w-3.5 h-3.5 text-blue-500" />
               <p className="text-lg font-bold text-white tabular-nums">{currentTime.toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}</p>
@@ -158,19 +158,20 @@ export default function CustomersPage() {
             <p className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">{currentTime.toLocaleDateString('es-CR', { weekday: 'short', day: '2-digit', month: 'short' })}</p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
             {!isCreating && (
               <button
                 onClick={handleCreate}
-                className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-xl text-white font-bold text-sm transition-all flex items-center gap-2"
+                className="bg-blue-600 hover:bg-blue-700 px-3 md:px-6 py-2.5 md:py-3 rounded-xl text-white font-bold text-xs md:text-sm transition-all flex items-center gap-1.5 md:gap-2"
               >
                 <Plus className="w-4 h-4" />
-                Nuevo Cliente
+                <span className="hidden sm:inline">Nuevo Cliente</span>
+                <span className="sm:hidden">Nuevo</span>
               </button>
             )}
 
             <Link href="/logout">
-              <button className="p-3 bg-white/5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all border border-white/5">
+              <button className="p-2.5 md:p-3 bg-white/5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all border border-white/5">
                 <LogOut className="w-4 h-4" />
               </button>
             </Link>
@@ -178,60 +179,60 @@ export default function CustomersPage() {
         </div>
       </header>
 
-      <main className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto">
+      <main className="p-4 md:p-8 space-y-6 max-w-7xl mx-auto">
         {!isCreating ? (
           <>
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
               <div className="bg-white/5 p-5 rounded-xl border border-white/5 hover:bg-white/[0.08] transition-all">
-                <div className="p-3 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-lg text-white shadow-lg mb-4 inline-flex">
-                  <Users className="w-4 h-4" />
+                <div className="p-3 bg-gradient-to-tr from-purple-500 to-purple-600 rounded-lg text-white shadow-lg mb-4 inline-flex">
+                  <Users className="w-5 h-5" />
                 </div>
-                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wide mb-2">Total Clientes</p>
-                <h3 className="text-2xl font-black text-white tabular-nums">{totalCustomers}</h3>
-                <p className="text-xs text-slate-400 mt-2 font-medium">Registrados</p>
+                <p className="text-[10px] md:text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-2">Total Clientes</p>
+                <h3 className="text-2xl md:text-3xl font-black text-white tabular-nums">{totalCustomers}</h3>
+                <p className="text-xs md:text-sm text-slate-400 mt-2 font-medium">Registrados</p>
               </div>
 
               <div className="bg-white/5 p-5 rounded-xl border border-white/5 hover:bg-white/[0.08] transition-all">
-                <div className="p-3 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-lg text-white shadow-lg mb-4 inline-flex">
-                  <CheckCircle className="w-4 h-4" />
+                <div className="p-3 bg-gradient-to-tr from-emerald-500 to-teal-600 rounded-lg text-white shadow-lg mb-4 inline-flex">
+                  <CheckCircle className="w-5 h-5" />
                 </div>
-                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wide mb-2">Con Email</p>
-                <h3 className="text-2xl font-black text-white tabular-nums">{customersWithEmail}</h3>
-                <p className="text-xs text-slate-400 mt-2 font-medium">
+                <p className="text-[10px] md:text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-2">Con Email</p>
+                <h3 className="text-2xl md:text-3xl font-black text-white tabular-nums">{customersWithEmail}</h3>
+                <p className="text-xs md:text-sm text-slate-400 mt-2 font-medium">
                   {totalCustomers > 0 ? `${((customersWithEmail / totalCustomers) * 100).toFixed(0)}%` : '0%'} del total
                 </p>
               </div>
 
               <div className="bg-white/5 p-5 rounded-xl border border-white/5 hover:bg-white/[0.08] transition-all">
-                <div className="p-3 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-lg text-white shadow-lg mb-4 inline-flex">
-                  <CheckCircle className="w-4 h-4" />
+                <div className="p-3 bg-gradient-to-tr from-orange-500 to-amber-600 rounded-lg text-white shadow-lg mb-4 inline-flex">
+                  <CheckCircle className="w-5 h-5" />
                 </div>
-                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wide mb-2">Con Teléfono</p>
-                <h3 className="text-2xl font-black text-white tabular-nums">{customersWithPhone}</h3>
-                <p className="text-xs text-slate-400 mt-2 font-medium">
+                <p className="text-[10px] md:text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-2">Con Teléfono</p>
+                <h3 className="text-2xl md:text-3xl font-black text-white tabular-nums">{customersWithPhone}</h3>
+                <p className="text-xs md:text-sm text-slate-400 mt-2 font-medium">
                   {totalCustomers > 0 ? `${((customersWithPhone / totalCustomers) * 100).toFixed(0)}%` : '0%'} del total
                 </p>
               </div>
 
               <div className="bg-white/5 p-5 rounded-xl border border-white/5 hover:bg-white/[0.08] transition-all">
-                <div className="p-3 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-lg text-white shadow-lg mb-4 inline-flex">
-                  <CheckCircle className="w-4 h-4" />
+                <div className="p-3 bg-gradient-to-tr from-cyan-500 to-blue-600 rounded-lg text-white shadow-lg mb-4 inline-flex">
+                  <CheckCircle className="w-5 h-5" />
                 </div>
-                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wide mb-2">Con Cédula/RUC</p>
-                <h3 className="text-2xl font-black text-white tabular-nums">{customersWithTaxId}</h3>
-                <p className="text-xs text-slate-400 mt-2 font-medium">
+                <p className="text-[10px] md:text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-2">Con Cédula/RUC</p>
+                <h3 className="text-2xl md:text-3xl font-black text-white tabular-nums">{customersWithTaxId}</h3>
+                <p className="text-xs md:text-sm text-slate-400 mt-2 font-medium">
                   {totalCustomers > 0 ? `${((customersWithTaxId / totalCustomers) * 100).toFixed(0)}%` : '0%'} del total
                 </p>
               </div>
 
               <div className="bg-white/5 p-5 rounded-xl border border-white/5 hover:bg-white/[0.08] transition-all">
                 <div className="p-3 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-lg text-white shadow-lg mb-4 inline-flex">
-                  <CheckCircle className="w-4 h-4" />
+                  <CheckCircle className="w-5 h-5" />
                 </div>
-                <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wide mb-2">Datos Completos</p>
-                <h3 className="text-2xl font-black text-white tabular-nums">{customersComplete}</h3>
-                <p className="text-xs text-slate-400 mt-2 font-medium">Con todo completo</p>
+                <p className="text-[10px] md:text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-2">Datos Completos</p>
+                <h3 className="text-2xl md:text-3xl font-black text-white tabular-nums">{customersComplete}</h3>
+                <p className="text-xs md:text-sm text-slate-400 mt-2 font-medium">Con todo completo</p>
               </div>
             </div>
 
