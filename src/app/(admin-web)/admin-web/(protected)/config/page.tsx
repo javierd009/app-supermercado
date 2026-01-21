@@ -190,21 +190,21 @@ export default function AdminConfigPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl lg:text-3xl font-black text-white">Configuración</h1>
-            <p className="text-slate-400 text-sm font-medium mt-1">
+            <p className="text-slate-400 text-base font-medium mt-1">
               Ajustes del sistema y tipo de cambio
             </p>
           </div>
           <button
             onClick={loadConfig}
             disabled={isLoading}
-            className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white font-bold text-sm px-4 py-2 rounded-xl transition-all disabled:opacity-50"
+            className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white font-bold text-base px-5 py-3 rounded-xl transition-all disabled:opacity-50"
           >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
             Recargar
           </button>
         </div>
-        <div className="flex items-center gap-2 mt-3 text-xs text-slate-500">
-          <Info className="w-3 h-3" />
+        <div className="flex items-center gap-2 mt-3 text-sm text-slate-500">
+          <Info className="w-4 h-4" />
           <span>Última actualización: {formatTime(lastUpdate)}</span>
         </div>
       </div>
@@ -225,26 +225,26 @@ export default function AdminConfigPage() {
                   <DollarSign className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-white font-black text-xl">Tipo de Cambio</h2>
-                  <p className="text-green-100 text-sm font-medium">Dólar estadounidense (USD) a Colones (CRC)</p>
+                  <h2 className="text-white font-black text-2xl">Tipo de Cambio</h2>
+                  <p className="text-green-100 text-base font-medium">Dólar estadounidense (USD) a Colones (CRC)</p>
                 </div>
               </div>
 
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                <label className="text-white text-sm font-bold uppercase block mb-2">
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5">
+                <label className="text-white text-base font-bold uppercase block mb-3">
                   ₡ Colones por cada $1 USD
                 </label>
                 <input
                   type="number"
                   value={exchangeRate}
                   onChange={(e) => setExchangeRate(parseFloat(e.target.value) || 0)}
-                  className="w-full px-4 py-3 bg-white/20 border-2 border-white/30 rounded-xl text-white font-black text-2xl focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50"
+                  className="w-full px-5 py-4 bg-white/20 border-2 border-white/30 rounded-xl text-white font-black text-3xl focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50"
                   placeholder="540"
                   step="0.01"
                 />
-                <div className="mt-3 flex items-center justify-between text-white/80 text-sm font-medium">
+                <div className="mt-3 flex items-center justify-between text-white/80 text-base font-medium">
                   <span>Ejemplo: $100 USD =</span>
-                  <span className="font-black text-lg">{formatCurrency(100 * exchangeRate)}</span>
+                  <span className="font-black text-xl">{formatCurrency(100 * exchangeRate)}</span>
                 </div>
               </div>
             </div>
@@ -256,28 +256,28 @@ export default function AdminConfigPage() {
                   <TrendingUp className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-white font-black text-lg">IVA (Impuesto sobre el Valor Agregado)</h3>
-                  <p className="text-slate-400 text-sm font-medium">Porcentaje aplicado a las ventas</p>
+                  <h3 className="text-white font-black text-xl">IVA (Impuesto sobre el Valor Agregado)</h3>
+                  <p className="text-slate-400 text-base font-medium">Porcentaje aplicado a las ventas</p>
                 </div>
               </div>
 
-              <div className="bg-white/5 rounded-xl p-4">
-                <label className="text-slate-400 text-sm font-bold uppercase block mb-2">
+              <div className="bg-white/5 rounded-xl p-5">
+                <label className="text-slate-400 text-base font-bold uppercase block mb-3">
                   Porcentaje de IVA (%)
                 </label>
                 <input
                   type="number"
                   value={taxRate}
                   onChange={(e) => setTaxRate(parseFloat(e.target.value) || 0)}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white font-black text-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-5 py-4 bg-white/10 border border-white/20 rounded-xl text-white font-black text-2xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="13"
                   step="0.01"
                   min="0"
                   max="100"
                 />
-                <div className="mt-3 flex items-center justify-between text-slate-400 text-sm font-medium">
+                <div className="mt-3 flex items-center justify-between text-slate-400 text-base font-medium">
                   <span>Ejemplo: {formatCurrency(1000)} + IVA =</span>
-                  <span className="font-black text-white text-lg">
+                  <span className="font-black text-white text-xl">
                     {formatCurrency(1000 * (1 + taxRate / 100))}
                   </span>
                 </div>
@@ -291,20 +291,20 @@ export default function AdminConfigPage() {
                   <Globe className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-white font-black text-lg">Información del Negocio</h3>
-                  <p className="text-slate-400 text-sm font-medium">Datos generales</p>
+                  <h3 className="text-white font-black text-xl">Información del Negocio</h3>
+                  <p className="text-slate-400 text-base font-medium">Datos generales</p>
                 </div>
               </div>
 
-              <div className="bg-white/5 rounded-xl p-4">
-                <label className="text-slate-400 text-sm font-bold uppercase block mb-2">
+              <div className="bg-white/5 rounded-xl p-5">
+                <label className="text-slate-400 text-base font-bold uppercase block mb-3">
                   Nombre del Negocio
                 </label>
                 <input
                   type="text"
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white font-bold text-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-5 py-4 bg-white/10 border border-white/20 rounded-xl text-white font-bold text-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="La Sabrosita"
                 />
               </div>
@@ -314,7 +314,7 @@ export default function AdminConfigPage() {
             <button
               onClick={saveConfig}
               disabled={isSaving}
-              className={`w-full flex items-center justify-center gap-3 font-black text-lg py-4 rounded-xl transition-all ${
+              className={`w-full flex items-center justify-center gap-3 font-black text-xl py-5 rounded-xl transition-all ${
                 saveSuccess
                   ? 'bg-green-600 text-white'
                   : 'bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50'
@@ -322,12 +322,12 @@ export default function AdminConfigPage() {
             >
               {saveSuccess ? (
                 <>
-                  <CheckCircle className="w-6 h-6" />
+                  <CheckCircle className="w-7 h-7" />
                   Guardado Exitosamente
                 </>
               ) : (
                 <>
-                  <Save className={`w-6 h-6 ${isSaving ? 'animate-pulse' : ''}`} />
+                  <Save className={`w-7 h-7 ${isSaving ? 'animate-pulse' : ''}`} />
                   {isSaving ? 'Guardando...' : 'Guardar Cambios'}
                 </>
               )}
@@ -340,10 +340,10 @@ export default function AdminConfigPage() {
                   <Settings className="w-5 h-5 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="text-white font-bold text-sm mb-2">
+                  <h4 className="text-white font-bold text-base mb-2">
                     Sincronización Automática
                   </h4>
-                  <ul className="space-y-1 text-blue-200 text-sm font-medium">
+                  <ul className="space-y-1 text-blue-200 text-base font-medium">
                     <li>• Los cambios se aplican inmediatamente en todos los POS</li>
                     <li>• El tipo de cambio se usa para calcular precios en dólares</li>
                     <li>• Las ventas existentes mantienen el tipo de cambio histórico</li>
@@ -355,16 +355,16 @@ export default function AdminConfigPage() {
 
             {/* Quick Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                <p className="text-slate-400 text-xs font-bold uppercase mb-2">Tipo de Cambio Actual</p>
-                <p className="text-white text-3xl font-black">{formatCurrency(exchangeRate)}</p>
-                <p className="text-slate-500 text-sm font-medium mt-1">por cada $1 USD</p>
+              <div className="bg-white/5 border border-white/10 rounded-xl p-5">
+                <p className="text-slate-400 text-sm font-bold uppercase mb-2">Tipo de Cambio Actual</p>
+                <p className="text-white text-4xl font-black">{formatCurrency(exchangeRate)}</p>
+                <p className="text-slate-500 text-base font-medium mt-1">por cada $1 USD</p>
               </div>
 
-              <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-                <p className="text-slate-400 text-xs font-bold uppercase mb-2">IVA Configurado</p>
-                <p className="text-white text-3xl font-black">{taxRate}%</p>
-                <p className="text-slate-500 text-sm font-medium mt-1">aplicado a ventas</p>
+              <div className="bg-white/5 border border-white/10 rounded-xl p-5">
+                <p className="text-slate-400 text-sm font-bold uppercase mb-2">IVA Configurado</p>
+                <p className="text-white text-4xl font-black">{taxRate}%</p>
+                <p className="text-slate-500 text-base font-medium mt-1">aplicado a ventas</p>
               </div>
             </div>
           </>

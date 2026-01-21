@@ -123,7 +123,7 @@ export default function AdminCustomersPage() {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <h1 className="text-2xl lg:text-3xl font-black text-white">Clientes</h1>
-            <p className="text-slate-400 text-sm font-medium mt-1">
+            <p className="text-slate-400 text-base font-medium mt-1">
               Base de datos de clientes y estadísticas
             </p>
           </div>
@@ -136,7 +136,7 @@ export default function AdminCustomersPage() {
               placeholder="Buscar por nombre, teléfono, email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-base placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -144,8 +144,8 @@ export default function AdminCustomersPage() {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3 mt-4">
           <div className="bg-white/5 border border-white/10 rounded-xl p-3">
-            <p className="text-slate-400 text-xs font-bold uppercase">Total Clientes</p>
-            <p className="text-white text-xl font-black">{customers.length}</p>
+            <p className="text-slate-400 text-sm font-bold uppercase">Total Clientes</p>
+            <p className="text-white text-2xl font-black">{customers.length}</p>
           </div>
           <div className="bg-white/5 border border-white/10 rounded-xl p-3">
             <p className="text-slate-400 text-xs font-bold uppercase">Clientes Activos</p>
@@ -186,17 +186,17 @@ export default function AdminCustomersPage() {
                 {/* Customer Header */}
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
-                    <h3 className="text-white font-black text-lg mb-1">{customer.name}</h3>
-                    <div className="flex flex-col gap-1 text-slate-400 text-sm font-medium">
+                    <h3 className="text-white font-black text-xl mb-1">{customer.name}</h3>
+                    <div className="flex flex-col gap-1 text-slate-400 text-base font-medium">
                       {customer.phone && (
                         <div className="flex items-center gap-2">
-                          <Phone className="w-3 h-3" />
+                          <Phone className="w-4 h-4" />
                           <span>{customer.phone}</span>
                         </div>
                       )}
                       {customer.email && (
                         <div className="flex items-center gap-2">
-                          <Mail className="w-3 h-3" />
+                          <Mail className="w-4 h-4" />
                           <span>{customer.email}</span>
                         </div>
                       )}
@@ -204,8 +204,8 @@ export default function AdminCustomersPage() {
                   </div>
 
                   <div className="text-right">
-                    <p className="text-slate-400 text-xs font-bold uppercase">Cliente desde</p>
-                    <p className="text-white text-sm font-bold">{formatDate(customer.created_at)}</p>
+                    <p className="text-slate-400 text-sm font-bold uppercase">Cliente desde</p>
+                    <p className="text-white text-base font-bold">{formatDate(customer.created_at)}</p>
                   </div>
                 </div>
 
@@ -214,24 +214,24 @@ export default function AdminCustomersPage() {
                   <div className="bg-white/5 rounded-lg p-3">
                     <div className="flex items-center gap-2 mb-1">
                       <ShoppingBag className="w-4 h-4 text-blue-400" />
-                      <p className="text-slate-400 text-xs font-bold uppercase">Compras</p>
+                      <p className="text-slate-400 text-sm font-bold uppercase">Compras</p>
                     </div>
-                    <p className="text-white text-xl font-black">{customer.totalPurchases}</p>
+                    <p className="text-white text-2xl font-black">{customer.totalPurchases}</p>
                   </div>
 
                   <div className="bg-white/5 rounded-lg p-3">
                     <div className="flex items-center gap-2 mb-1">
                       <TrendingUp className="w-4 h-4 text-green-400" />
-                      <p className="text-slate-400 text-xs font-bold uppercase">Total Gastado</p>
+                      <p className="text-slate-400 text-sm font-bold uppercase">Total Gastado</p>
                     </div>
-                    <p className="text-white text-xl font-black">{formatCurrency(customer.totalSpent)}</p>
+                    <p className="text-white text-2xl font-black">{formatCurrency(customer.totalSpent)}</p>
                   </div>
                 </div>
 
                 {/* Notes */}
                 {customer.notes && (
-                  <div className="mt-3 bg-white/5 rounded-lg p-2">
-                    <p className="text-slate-300 text-sm font-medium">{customer.notes}</p>
+                  <div className="mt-3 bg-white/5 rounded-lg p-3">
+                    <p className="text-slate-300 text-base font-medium">{customer.notes}</p>
                   </div>
                 )}
               </div>

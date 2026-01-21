@@ -146,21 +146,21 @@ export default function AdminDashboardPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl lg:text-3xl font-black text-white">Dashboard</h1>
-            <p className="text-slate-400 text-sm font-medium mt-1">
+            <p className="text-slate-400 text-base font-medium mt-1">
               Gestión remota en tiempo real
             </p>
           </div>
           <button
             onClick={loadStats}
             disabled={isLoading}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm px-4 py-2 rounded-xl transition-all disabled:opacity-50"
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-base px-5 py-3 rounded-xl transition-all disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
             Actualizar
           </button>
         </div>
-        <div className="flex items-center gap-2 mt-3 text-xs text-slate-500">
-          <Clock className="w-3 h-3" />
+        <div className="flex items-center gap-2 mt-3 text-sm text-slate-500">
+          <Clock className="w-4 h-4" />
           <span>Última actualización: {formatTime(lastUpdate)}</span>
           <span className="bg-green-500 w-2 h-2 rounded-full animate-pulse"></span>
           <span className="text-green-400 font-bold">En tiempo real</span>
@@ -174,11 +174,11 @@ export default function AdminDashboardPage() {
           <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-6 border border-blue-500/50">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-blue-200 text-sm font-bold uppercase tracking-wide mb-2">
+                <p className="text-blue-200 text-base font-bold uppercase tracking-wide mb-2">
                   Ventas Hoy
                 </p>
-                <h2 className="text-4xl font-black text-white mb-1">{stats.todaySales}</h2>
-                <p className="text-blue-200 text-xs font-medium">Transacciones</p>
+                <h2 className="text-5xl font-black text-white mb-1">{stats.todaySales}</h2>
+                <p className="text-blue-200 text-sm font-medium">Transacciones</p>
               </div>
               <div className="bg-white/20 p-3 rounded-xl">
                 <ShoppingCart className="w-6 h-6 text-white" />
@@ -189,11 +189,11 @@ export default function AdminDashboardPage() {
           <div className="bg-gradient-to-br from-green-600 to-green-700 rounded-2xl p-6 border border-green-500/50">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-green-200 text-sm font-bold uppercase tracking-wide mb-2">
+                <p className="text-green-200 text-base font-bold uppercase tracking-wide mb-2">
                   Ingresos Hoy
                 </p>
-                <h2 className="text-3xl font-black text-white mb-1">{formatCurrency(stats.todayRevenue)}</h2>
-                <p className="text-green-200 text-xs font-medium">Ventas activas</p>
+                <h2 className="text-4xl font-black text-white mb-1">{formatCurrency(stats.todayRevenue)}</h2>
+                <p className="text-green-200 text-sm font-medium">Ventas activas</p>
               </div>
               <div className="bg-white/20 p-3 rounded-xl">
                 <DollarSign className="w-6 h-6 text-white" />
@@ -210,10 +210,10 @@ export default function AdminDashboardPage() {
                 <Package className="w-5 h-5 text-white" />
               </div>
             </div>
-            <p className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-2">
+            <p className="text-slate-400 text-sm font-bold uppercase tracking-wide mb-2">
               Total Productos
             </p>
-            <h3 className="text-3xl font-black text-white">{stats.totalProducts}</h3>
+            <h3 className="text-4xl font-black text-white">{stats.totalProducts}</h3>
           </div>
 
           <div className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/[0.08] transition-all">
@@ -226,10 +226,10 @@ export default function AdminDashboardPage() {
                 <AlertTriangle className="w-5 h-5 text-white" />
               </div>
             </div>
-            <p className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-2">
+            <p className="text-slate-400 text-sm font-bold uppercase tracking-wide mb-2">
               Stock Bajo
             </p>
-            <h3 className={`text-3xl font-black ${
+            <h3 className={`text-4xl font-black ${
               stats.lowStockProducts > 0 ? 'text-yellow-400' : 'text-green-400'
             }`}>
               {stats.lowStockProducts}
@@ -242,10 +242,10 @@ export default function AdminDashboardPage() {
                 <Users className="w-5 h-5 text-white" />
               </div>
             </div>
-            <p className="text-slate-400 text-xs font-bold uppercase tracking-wide mb-2">
+            <p className="text-slate-400 text-sm font-bold uppercase tracking-wide mb-2">
               Clientes
             </p>
-            <h3 className="text-3xl font-black text-white">{stats.totalCustomers}</h3>
+            <h3 className="text-4xl font-black text-white">{stats.totalCustomers}</h3>
           </div>
         </div>
 
@@ -256,13 +256,13 @@ export default function AdminDashboardPage() {
               <TrendingUp className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 className="text-white font-black text-lg">Cajas Activas</h3>
-              <p className="text-slate-400 text-sm font-medium">Turnos abiertos en este momento</p>
+              <h3 className="text-white font-black text-xl">Cajas Activas</h3>
+              <p className="text-slate-400 text-base font-medium">Turnos abiertos en este momento</p>
             </div>
           </div>
           <div className="text-center py-8">
-            <h2 className="text-5xl font-black text-white mb-2">{stats.activeCashRegisters}</h2>
-            <p className="text-slate-400 text-sm font-medium">
+            <h2 className="text-6xl font-black text-white mb-2">{stats.activeCashRegisters}</h2>
+            <p className="text-slate-400 text-base font-medium">
               {stats.activeCashRegisters === 0
                 ? 'No hay cajas abiertas'
                 : stats.activeCashRegisters === 1
@@ -279,10 +279,10 @@ export default function AdminDashboardPage() {
               <Clock className="w-5 h-5 text-white" />
             </div>
             <div className="flex-1">
-              <h4 className="text-white font-bold text-sm mb-1">
+              <h4 className="text-white font-bold text-base mb-1">
                 Datos en Tiempo Real
               </h4>
-              <p className="text-blue-200 text-sm font-medium">
+              <p className="text-blue-200 text-base font-medium">
                 Los cambios en los POS se reflejan automáticamente aquí.
                 La sincronización es bidireccional: cambios aquí se ven en los POS en menos de 1 segundo.
               </p>
