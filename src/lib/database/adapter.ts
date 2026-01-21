@@ -300,9 +300,7 @@ class DatabaseAdapter {
       canceled_by: null as any, // No existe en SQLite
       cancel_reason: null as any, // No existe en SQLite
     },
-    sale_items: {
-      created_at: null as any, // sale_items de Supabase no tiene created_at
-    },
+    // sale_items: campos iguales en ambas bases
   };
 
   /**

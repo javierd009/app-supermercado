@@ -90,7 +90,6 @@ class SalesService {
           tax_rate: item.taxRate,
           tax_amount: taxCalc.taxAmount,
           subtotal_before_tax: taxCalc.subtotalBeforeTax,
-          created_at: now,
         };
 
         await databaseAdapter.insert('sale_items', saleItemData);
