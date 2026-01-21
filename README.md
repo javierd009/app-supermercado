@@ -1,202 +1,331 @@
-# 🏪 Sabrosita POS
+# 🏪 App Supermercado - Sistema POS + Admin Web
 
-> Sistema POS moderno para pulperías costarricenses • Reemplazo de Mónica 8.5
+> Sistema completo de punto de venta con panel de administración remota • Sincronización en tiempo real
 
-**Versión:** 1.0.0 MVP
-**Estado:** 🟡 40% Completo - Código 100% listo, falta ejecución
+**Versión:** 1.1.0 - Admin Web PWA
+**Estado:** ✅ **EN PRODUCCIÓN**
 **Fecha:** Enero 2026
 
-🚀 **[VER LISTO_PARA_EJECUTAR.md](LISTO_PARA_EJECUTAR.md)** ← Empezar aquí (20 min)
+---
+
+## 🌐 **DEMO EN VIVO**
+
+### Admin Web (PWA) - Gestión Remota
+**🚀 URL**: https://sabrosita-v3.vercel.app/admin-web/login
+
+- 📊 **Dashboard**: Métricas en tiempo real
+- 📦 **Productos**: Actualizar precios desde cualquier lugar
+- ⚙️ **Configuración**: Tipo de cambio y settings
+- 👥 **Clientes**: Base de datos con estadísticas
+- 📈 **Reportes**: Exportación a CSV
+
+**📖 Documentación**: [ADMIN-WEB-README.md](./ADMIN-WEB-README.md)
+
+### GitHub Repository
+**📦 Código**: https://github.com/javierd009/app-supermercado
 
 ---
 
 ## 🎯 Descripción
 
-Sistema de punto de venta (POS) desktop diseñado específicamente para pulperías y pequeños negocios en Costa Rica. Reemplaza el software legacy Mónica 8.5 con una interfaz moderna, manteniendo la simplicidad y rapidez del flujo original.
+Sistema completo para supermercados y pulperías que combina:
 
-**Problema que resuelve:**
-- Mónica 8.5 crashea en Windows 11
-- Interfaz anticuada y difícil de mantener
-- No hay soporte técnico disponible
-- Falta integración con hardware moderno
-
-**Solución:**
-- Desktop app moderna con Electron
-- Compatible con Windows 11
+### 1. **POS Desktop (Electron)** - Para cajeros
+- Aplicación desktop para Windows/Mac/Linux
+- Funciona offline con SQLite local
+- Sincronización bidireccional con Supabase
 - Integración con scanners e impresoras USB
-- Cloud backup automático
-- Importación de datos desde Mónica 8.5
+- Interfaz optimizada para flujo rápido de ventas
+
+### 2. **Admin Web (PWA)** - Para administradores ✨ **NUEVO**
+- Panel web accesible desde cualquier dispositivo
+- Actualización remota de precios e inventario
+- Dashboard con métricas en tiempo real
+- Reportes y exportación de datos
+- Instalable como app nativa (PWA)
+
+**Arquitectura:**
+```
+┌─────────────────┐
+│   Admin Web     │  ← Gestión remota (navegador/PWA)
+│  (Vercel PWA)   │
+└────────┬────────┘
+         │ HTTPS
+         ▼
+┌─────────────────┐
+│    Supabase     │  ← Base de datos central
+│   PostgreSQL    │     + Realtime Sync
+└────────┬────────┘
+         │ WebSocket
+         ▼
+┌─────────────────┐
+│   POS Desktop   │  ← Terminal de caja
+│  (Electron app) │     + SQLite local
+└─────────────────┘
+```
+
+**Sincronización en tiempo real**: Cambios en Admin Web → Supabase → POS en < 2 segundos
 
 ---
 
 ## ⚡ Quick Start
 
-### Instalación
+### Opción A: Usar Admin Web (Recomendado) ⭐
+
+**No necesitas instalar nada** - Usa la versión en producción:
+
+1. **Acceder**: https://sabrosita-v3.vercel.app/admin-web/login
+2. **Login**: Usuario con rol `admin` o `super_admin`
+3. **Gestionar**: Productos, precios, clientes, reportes
+4. **Instalar PWA**: Click en "Instalar app" desde el navegador
+
+📖 **Guía completa**: [ADMIN-WEB-README.md](./ADMIN-WEB-README.md)
+
+---
+
+### Opción B: Instalar POS Desktop (Local)
+
+Para desarrolladores o uso como terminal de caja:
 
 ```bash
 # 1. Clonar repositorio
-cd sabrosita-v3
+git clone https://github.com/javierd009/app-supermercado.git
+cd app-supermercado
 
 # 2. Instalar dependencias
 npm install
 
-# 3. Configurar Supabase
+# 3. Configurar variables de entorno
 # Crear archivo .env.local con:
-# NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-# NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+cat > .env.local << EOF
+NEXT_PUBLIC_SUPABASE_URL=https://lkiyyweipmgzcxcnocxs.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key_aqui
+EOF
 
-# 4. Ejecutar migraciones SQL
-# Copiar contenido de supabase/migrations/*.sql
-# Ejecutar en Supabase SQL Editor
+# 4. Ejecutar en modo desarrollo
+npm run dev
 
-# 5. Iniciar en desarrollo
-npm run dev          # Next.js en http://localhost:3000
-npm run dev:electron # Electron app
-
-# 6. Build para producción
-npm run build
-npm run build:electron # Genera .exe en /dist
+# 5. Ejecutar como Electron app
+npm run dev:electron
 ```
 
-### Login Inicial
-
-```
-Usuario: ADMIN
-Contraseña: admin123
-```
+📖 **Setup completo**: [SETUP_INSTRUCTIONS.md](./SETUP_INSTRUCTIONS.md)
 
 ---
 
-## 🎨 Stack Tecnológico
+## 📚 Documentación Completa
 
-| Capa | Tecnología | Por Qué |
-|------|------------|---------|
-| **Desktop** | Electron 33 | Compatibilidad Windows 11 |
-| **Framework** | Next.js 16 | Full-stack, Turbopack rápido |
-| **UI** | React 19 + Tailwind CSS | Moderno, responsive |
-| **Language** | TypeScript | Type-safety |
-| **State** | Zustand | Lightweight, simple |
-| **Database** | Supabase (PostgreSQL) | Cloud backup, RLS |
-| **Auth** | Supabase Auth | Seguro, escalable |
-| **Hardware** | IPC Electron | Scanner, impresora |
+| Documento | Descripción |
+|-----------|-------------|
+| **[ADMIN-WEB-README.md](./ADMIN-WEB-README.md)** | Guía completa del Admin Web + plan de testing |
+| **[DEPLOYMENT-SUCCESS.md](./DEPLOYMENT-SUCCESS.md)** | Resumen del deployment + URLs de producción |
+| **[DEPLOYMENT-GUIDE.md](./DEPLOYMENT-GUIDE.md)** | Cómo hacer deployment a Vercel |
+| **[PROJECT-STATUS.md](./PROJECT-STATUS.md)** | Estado del proyecto + próximos pasos |
+| **[SETUP_INSTRUCTIONS.md](./SETUP_INSTRUCTIONS.md)** | Setup del POS local |
 
 ---
 
-## 📦 Features Implementadas ✅
+## ✨ Features Principales
 
-1. **Autenticación Simple** - Login alfanumérico, 3 roles, sesiones 8h → [📖 Docs](src/features/auth/README.md)
-2. **Gestión de Productos** - CRUD + CSV import desde Mónica 8.5 → [📖 Docs](src/features/products/README.md)
-3. **Punto de Venta (POS)** - Carrito, 3 métodos de pago, atajos teclado → [📖 Docs](src/features/pos/README.md)
-4. **Cash Register** - Apertura/cierre de caja con reconciliación → [📖 Docs](src/features/cash-register/README.md)
-5. **Ventas** - Persistencia automática + actualización de stock → [📖 Docs](src/features/sales/README.md)
-6. **Impresión Térmica** - ESC/POS, Epson TM-T20/T88 compatible → [📖 Docs](src/features/printing/README.md)
-7. **Scanner USB** - Detección automática, indicador visual → [📖 Docs](src/features/scanner/README.md)
-8. **Multi-Ventana** - Múltiples cajeros simultáneos → [📖 Docs](src/features/windows/README.md)
+### Admin Web (PWA) - En Producción ✅
+
+- **📊 Dashboard**: Ventas del día, ingresos, stock bajo, cajas activas (tiempo real)
+- **📦 Productos**: CRUD completo, búsqueda, actualización de precios/stock
+- **⚙️ Configuración**: Tipo de cambio USD→CRC, IVA, nombre del negocio
+- **👥 Clientes**: Base de datos con estadísticas de compras
+- **📈 Reportes**: 4 tipos (ventas, inventario, clientes, financiero) + exportación CSV
+- **🔄 Sincronización**: Bidireccional en tiempo real con todos los POS
+- **📱 PWA**: Instalable como app nativa, funciona offline
+- **🔐 Seguridad**: Autenticación con roles, RLS en todas las tablas
+
+### POS Desktop (Electron)
+
+- **💰 Punto de Venta**: Flujo optimizado para venta rápida
+- **📊 Gestión de Cajas**: Apertura/cierre de turno con conteo
+- **📦 Inventario**: CRUD de productos, importación CSV
+- **👥 Clientes**: Gestión de clientes frecuentes
+- **🖨️ Impresión**: Tickets de venta (USB)
+- **📡 Scanner**: Soporte para lectores de código de barras
+- **💾 Offline**: Funciona sin internet (SQLite local)
+- **🔄 Sync**: Sincronización automática con Supabase
 
 ---
 
-## 📂 Estructura del Proyecto
+## 🛠️ Stack Tecnológico
+
+### Frontend
+- **Framework**: Next.js 16 (App Router + Turbopack)
+- **UI Library**: React 19
+- **Language**: TypeScript 5
+- **Styling**: Tailwind CSS 3.4
+- **Icons**: Lucide React
+
+### Backend & Database
+- **BaaS**: Supabase (PostgreSQL + Realtime)
+- **Local DB**: SQLite (better-sqlite3)
+- **ORM**: Direct SQL queries + Supabase client
+- **Auth**: Supabase Auth + custom role validation
+
+### Desktop (POS)
+- **Framework**: Electron 28
+- **Bundler**: Next.js production build
+- **Storage**: SQLite local database
+
+### Admin Web (PWA)
+- **Deployment**: Vercel Edge Network
+- **PWA**: Service Worker + Web Manifest
+- **Caching**: Cache-First (static) + Network-First (API)
+- **SSL**: Let's Encrypt (automático)
+
+### Development
+- **Package Manager**: npm
+- **Linting**: ESLint + Next.js config
+- **Type Checking**: TypeScript strict mode
+- **Git Hooks**: Conventional Commits
+
+---
+
+## 📦 Estructura del Proyecto
 
 ```
-sabrosita-v3/
-├── electron/               # Electron main process
-│   ├── main.js            # IPC handlers
-│   └── preload.js         # Secure bridge
-│
 ├── src/
-│   ├── app/               # Next.js App Router
-│   │   ├── (auth)/       # Login flow
-│   │   └── (main)/       # Protected routes
-│   │       ├── dashboard/
-│   │       ├── pos/
-│   │       ├── products/
-│   │       └── cash-register/
+│   ├── app/                      # Next.js App Router
+│   │   ├── (main)/              # POS routes
+│   │   ├── (admin-web)/         # Admin Web routes ✨ NUEVO
+│   │   └── layout.tsx           # Root layout
 │   │
-│   ├── features/          # Feature-first architecture
-│   │   ├── auth/
-│   │   ├── products/
-│   │   ├── pos/
-│   │   ├── cash-register/
-│   │   ├── sales/
-│   │   ├── printing/
-│   │   ├── scanner/
-│   │   └── windows/
+│   ├── features/                 # Feature-first architecture
+│   │   ├── auth/                # Autenticación
+│   │   ├── pos/                 # Punto de venta
+│   │   ├── products/            # Gestión de productos
+│   │   ├── cash-register/       # Cajas
+│   │   ├── customers/           # Clientes
+│   │   ├── reports/             # Reportes
+│   │   └── ...
 │   │
-│   └── shared/            # Shared code
+│   ├── lib/                      # Utilities y servicios
+│   │   ├── database/            # Database adapters
+│   │   ├── supabase/            # Supabase client
+│   │   └── pwa/                 # PWA utilities ✨ NUEVO
+│   │
+│   └── shared/                   # Componentes reutilizables
+│       ├── components/
+│       ├── hooks/
+│       └── utils/
 │
-├── supabase/
-│   └── migrations/        # Database schema
+├── electron/                     # Electron app
+│   ├── main.js                  # Main process
+│   ├── preload.js               # Preload script
+│   └── database/                # SQLite setup
 │
-├── PROYECTO_COMPLETADO.md # Documentación completa
-└── README.md              # Este archivo
+├── supabase/                     # Supabase config
+│   └── migrations/              # SQL migrations
+│
+├── public/                       # Static assets
+│   ├── sw.js                    # Service Worker ✨ NUEVO
+│   └── site.webmanifest         # PWA manifest ✨ NUEVO
+│
+└── docs/                         # Documentación
+    ├── ADMIN-WEB-README.md      ✨ NUEVO
+    ├── DEPLOYMENT-SUCCESS.md    ✨ NUEVO
+    └── ...
 ```
 
 ---
 
-## 🗄️ Base de Datos
+## 🚀 Deployment
 
-### Tablas
+### Admin Web (Producción)
 
-- `users` - Usuarios del sistema
-- `products` - Inventario
-- `cash_registers` - Turnos de caja
-- `sales` - Encabezados de venta
-- `sale_items` - Líneas de venta
+**URL**: https://sabrosita-v3.vercel.app
 
-### Migración
+**Plataforma**: Vercel Edge Network
+- ✅ Build automático desde GitHub
+- ✅ SSL/HTTPS incluido
+- ✅ CDN global (70+ ubicaciones)
+- ✅ Variables de entorno configuradas
 
-```bash
-# Ejecutar en Supabase SQL Editor
-cat supabase/migrations/20260116_initial_schema.sql
-```
+### POS Desktop
 
----
-
-## 🧪 Testing
-
-### Casos Críticos
-
-1. **Venta Simple:** Escanear → F10 → Pago → Ticket
-2. **Multi-Cajero:** 2 ventanas, misma venta simultánea
-3. **Stock:** Vender más de lo disponible
-4. **Impresión:** Verificar formato de ticket
-5. **Scanner:** Detectar como "Scanner" no "Teclado"
-
-Ver checklist completo en [PROYECTO_COMPLETADO.md](PROYECTO_COMPLETADO.md)
-
----
-
-## 📖 Documentación Completa
-
-**Empezar aquí:**
-- 🚀 **[LISTO_PARA_EJECUTAR.md](LISTO_PARA_EJECUTAR.md)** - Guía para terminar el proyecto (20 min)
-- ⚡ **[SETUP_SUPABASE.md](SETUP_SUPABASE.md)** - Configurar base de datos (10 min)
-- ⭐ **[PASOS_FINALES.md](PASOS_FINALES.md)** - Paso a paso completo
-
-**Documentación técnica:**
-- **[CHANGELOG.md](CHANGELOG.md)** - Qué se implementó en v1.0.0
-- **[PROYECTO_COMPLETADO.md](PROYECTO_COMPLETADO.md)** - Documentación técnica completa
-- **[BUSINESS_LOGIC.md](BUSINESS_LOGIC.md)** - Lógica de negocio
-- **[INSTRUCCIONES_DEPLOYMENT.md](INSTRUCCIONES_DEPLOYMENT.md)** - Deployment en producción
-- **[INDICE_DOCUMENTACION.md](INDICE_DOCUMENTACION.md)** - Índice completo (~146 páginas)
-
----
-
-## 🚀 Despliegue
+Genera ejecutables para Windows/Mac/Linux:
 
 ```bash
-# Build
-npm run build
 npm run build:electron
-
-# Distribuir
-# Archivo: dist/Sabrosita-POS-Setup-1.0.0.exe
 ```
+
+Output en `dist/`:
+- `Sabrosita POS Setup.exe` (Windows)
+- `Sabrosita POS.app` (macOS)
+- `Sabrosita POS.AppImage` (Linux)
 
 ---
 
-**Desarrollado por:** Claude Sonnet 4.5  
-**Cliente:** Pulpería en Costa Rica  
-**Inspirado por:** Mónica 8.5  
+## 💰 Costos
 
-🚀 ¡Listo para operar!
+### Plan Actual (FREE)
+
+| Servicio | Plan | Costo |
+|----------|------|-------|
+| **Vercel** | Hobby | $0/mes |
+| **Supabase** | Free | $0/mes |
+| **Total** | | **$0/mes** |
+
+**Límites generosos**:
+- Vercel: 100 GB bandwidth, 100k invocations
+- Supabase: 500 MB database, 200 realtime connections
+
+---
+
+## 🤝 Contribuir
+
+Este es un proyecto open source. Contribuciones son bienvenidas:
+
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+---
+
+## 📄 Licencia
+
+Este proyecto es de código abierto y está disponible bajo la licencia MIT.
+
+---
+
+## 📞 Soporte y Contacto
+
+- **📦 GitHub**: https://github.com/javierd009/app-supermercado
+- **🚀 Demo**: https://sabrosita-v3.vercel.app/admin-web/login
+- **📚 Docs**: Ver archivos `.md` en el repositorio
+
+---
+
+## 🎯 Roadmap
+
+### Completado ✅
+- [x] POS Desktop funcional
+- [x] Admin Web PWA
+- [x] Sincronización en tiempo real
+- [x] Dashboard con métricas
+- [x] Gestión de productos remota
+- [x] Configuración de tipo de cambio
+- [x] Reportes y exportación CSV
+- [x] Deployment a producción
+
+### Próximas Features
+- [ ] Gráficos y visualizaciones en dashboard
+- [ ] Notificaciones push para stock bajo
+- [ ] Exportación de reportes a PDF
+- [ ] Gestión de usuarios desde Admin Web
+- [ ] Tema claro/oscuro
+- [ ] Soporte multi-idioma
+
+---
+
+**Desarrollado con**: Claude Code + SaaS Factory V3
+**Versión**: 1.1.0 - Admin Web PWA
+**Status**: ✅ EN PRODUCCIÓN
+
+🚀 **[Ver Demo en Vivo](https://sabrosita-v3.vercel.app/admin-web/login)**
