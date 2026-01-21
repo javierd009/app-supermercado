@@ -183,7 +183,7 @@ export default function ProductsPage() {
               </button>
               <button
                 onClick={handlePrintBarcodes}
-                className="bg-white/5 hover:bg-amber-500/20 px-2.5 md:px-4 py-2.5 md:py-2 rounded-xl text-amber-400 font-bold text-xs uppercase tracking-wide transition-all border border-white/5 flex items-center gap-1.5 md:gap-2"
+                className="bg-white/5 hover:bg-purple-500/20 px-2.5 md:px-4 py-2.5 md:py-2 rounded-xl text-purple-400 font-bold text-xs uppercase tracking-wide transition-all border border-white/5 flex items-center gap-1.5 md:gap-2"
               >
                 <Barcode className="w-4 h-4 md:w-3.5 md:h-3.5" />
                 <span className="hidden sm:inline">Códigos</span>
@@ -193,14 +193,14 @@ export default function ProductsPage() {
                 <>
                   <button
                     onClick={handleImport}
-                    className="bg-amber-600 hover:bg-amber-700 px-3 md:px-4 py-2.5 md:py-2 rounded-xl text-white font-bold text-sm md:text-xs uppercase tracking-wide transition-all flex items-center gap-1.5 md:gap-2"
+                    className="bg-blue-600 hover:bg-blue-700 px-3 md:px-4 py-2.5 md:py-2 rounded-xl text-white font-bold text-sm md:text-xs uppercase tracking-wide transition-all flex items-center gap-1.5 md:gap-2 shadow-lg shadow-blue-500/20"
                   >
                     <Upload className="w-4 h-4 md:w-3.5 md:h-3.5" />
                     <span>Importar</span>
                   </button>
                   <button
                     onClick={handleCreate}
-                    className="bg-emerald-600 hover:bg-emerald-700 px-3 md:px-4 py-2.5 md:py-2 rounded-xl text-white font-bold text-sm md:text-xs uppercase tracking-wide transition-all flex items-center gap-1.5 md:gap-2"
+                    className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 px-3 md:px-4 py-2.5 md:py-2 rounded-xl text-white font-bold text-sm md:text-xs uppercase tracking-wide transition-all flex items-center gap-1.5 md:gap-2 shadow-lg shadow-emerald-500/20"
                   >
                     <Plus className="w-4 h-4 md:w-3.5 md:h-3.5" />
                     <span>Nuevo</span>
@@ -225,7 +225,7 @@ export default function ProductsPage() {
             </div>
 
             <div className="bg-white/5 p-5 rounded-xl border border-white/5 hover:bg-white/[0.08] transition-all">
-              <div className="p-3 bg-gradient-to-tr from-amber-400 to-orange-600 rounded-lg text-white shadow-lg mb-4 inline-flex">
+              <div className="p-3 bg-gradient-to-tr from-purple-500 to-indigo-600 rounded-lg text-white shadow-lg mb-4 inline-flex">
                 <Layers className="w-4 h-4" />
               </div>
               <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wide mb-2">Categorías</p>
@@ -249,11 +249,11 @@ export default function ProductsPage() {
             </div>
 
             <div className="bg-white/5 p-5 rounded-xl border border-white/5 hover:bg-white/[0.08] transition-all">
-              <div className="p-3 bg-gradient-to-tr from-amber-400 to-orange-600 rounded-lg text-white shadow-lg mb-4 inline-flex">
+              <div className="p-3 bg-gradient-to-tr from-sky-400 to-blue-600 rounded-lg text-white shadow-lg mb-4 inline-flex">
                 <TrendingDown className="w-4 h-4" />
               </div>
               <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wide mb-2">Costo Total</p>
-              <h3 className="text-lg font-black text-amber-400 tabular-nums">{formatCurrency(totalCost)}</h3>
+              <h3 className="text-lg font-black text-sky-400 tabular-nums">{formatCurrency(totalCost)}</h3>
             </div>
 
             <div className="bg-white/5 p-5 rounded-xl border border-white/5 hover:bg-white/[0.08] transition-all">

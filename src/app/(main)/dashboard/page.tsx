@@ -60,7 +60,7 @@ export default function DashboardPage() {
       href: '/products',
       icon: <Package className="w-5 h-5" />,
       description: 'Stock y control de almacén',
-      gradient: 'from-amber-500 via-orange-500 to-amber-600',
+      gradient: 'from-purple-500 via-indigo-500 to-purple-600',
     },
     {
       title: 'Caja y Bancos',
