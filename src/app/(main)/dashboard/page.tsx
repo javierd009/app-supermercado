@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { useCashRegister } from '@/features/cash-register/hooks/useCashRegister';
+import { useCashRegister, useLoadCurrentRegister } from '@/features/cash-register/hooks/useCashRegister';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { configService } from '@/features/settings/services/configService';
@@ -24,6 +24,10 @@ import {
 export default function DashboardPage() {
   const { user } = useAuth();
   const { currentRegister } = useCashRegister();
+
+  // Cargar estado de caja al montar el componente
+  useLoadCurrentRegister();
+
   const [currentTime, setCurrentTime] = useState(new Date());
   const [businessName, setBusinessName] = useState('Sabrosita POS');
 

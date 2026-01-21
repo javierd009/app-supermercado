@@ -6,3 +6,32 @@
  * Personaliza tu tema aquí
  * Documentación: https://tailwindcss.com/docs/theme
  */
+
+/*
+ * Safe Area Support - iOS notch, status bar, etc.
+ * Respeta las zonas seguras del dispositivo móvil
+ */
+:root {
+  /* Definir variables CSS para safe area */
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+}
+
+/* Aplicar padding a body para evitar contenido en zonas no seguras */
+body {
+  padding-top: var(--safe-area-inset-top);
+  padding-right: var(--safe-area-inset-right);
+  padding-bottom: var(--safe-area-inset-bottom);
+  padding-left: var(--safe-area-inset-left);
+}
+
+/* Para elementos sticky/fixed que necesiten respetar safe area */
+.safe-area-top {
+  padding-top: var(--safe-area-inset-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: var(--safe-area-inset-bottom);
+}
