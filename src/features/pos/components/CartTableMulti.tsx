@@ -20,7 +20,8 @@ export function CartTableMulti({ windowId }: CartTableMultiProps) {
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
-      <div className="overflow-x-auto">
+      {/* Vista de Tabla - Solo Desktop */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left border-separate border-spacing-0">
           <thead>
             <tr className="bg-white/10 backdrop-blur-sm sticky top-0 z-10">
@@ -142,6 +143,113 @@ export function CartTableMulti({ windowId }: CartTableMultiProps) {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Vista de Tarjetas - Solo Móvil */}
+      <div className="md:hidden flex-1 overflow-y-auto p-3 space-y-3">
+        {items.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="p-4 bg-white/10 rounded-full mb-4">
+              <ShoppingBag className="h-12 w-12 text-slate-500" />
+            </div>
+            <p className="text-base font-bold text-white">El carrito está vacío</p>
+            <p className="text-xs text-slate-400 mt-1 text-center">Escanea un producto o búscalo manualmente</p>
+          </div>
+        ) : (
+          items.map((item) => (
+            <div
+              key={item.id}
+              onClick={() => setSelectedItemId(item.id)}
+              className={`relative rounded-xl border-2 transition-all ${
+                selectedItemId === item.id
+                  ? 'bg-blue-500/20 border-blue-500/50'
+                  : 'bg-white/5 border-white/10'
+              }`}
+            >
+              {/* Header del producto */}
+              <div className="p-3 border-b border-white/10">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-0.5">
+                      {item.code}
+                    </p>
+                    <h3 className="text-sm font-bold text-white leading-tight">
+                      {item.name}
+                    </h3>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (confirm(`¿Eliminar ${item.name}?`)) {
+                        removeItem(item.id);
+                      }
+                    }}
+                    className="flex-shrink-0 p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Información y controles */}
+              <div className="p-3 space-y-3">
+                {/* Cantidad */}
+                <div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Cantidad</p>
+                  <div className="inline-flex items-center bg-white/95 border border-white/20 rounded-lg p-1.5 shadow-sm">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        updateItemQuantity(item.id, item.quantity - 1);
+                      }}
+                      className="p-2 text-slate-600 hover:text-rose-500 hover:bg-rose-50 rounded-md transition-all active:scale-95"
+                    >
+                      <Minus className="w-5 h-5" />
+                    </button>
+                    <input
+                      type="number"
+                      min="1"
+                      value={item.quantity}
+                      onChange={(e) => {
+                        const qty = parseInt(e.target.value, 10);
+                        if (!isNaN(qty) && qty > 0) {
+                          updateItemQuantity(item.id, qty);
+                        }
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-16 text-center text-2xl font-black text-slate-900 focus:outline-none bg-transparent"
+                    />
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        updateItemQuantity(item.id, item.quantity + 1);
+                      }}
+                      className="p-2 text-slate-600 hover:text-blue-500 hover:bg-blue-50 rounded-md transition-all active:scale-95"
+                    >
+                      <Plus className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Precios */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Precio Unit.</p>
+                    <p className="text-base font-bold text-white tabular-nums">
+                      {formatCurrency(item.unitPrice)}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total</p>
+                    <p className="text-xl font-black text-white tabular-nums">
+                      {formatCurrency(item.subtotal)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
