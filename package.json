@@ -23,7 +23,6 @@
     "@supabase/supabase-js": "^2.49.0",
     "@tanstack/react-query": "^5.62.3",
     "bcryptjs": "^3.0.3",
-    "better-sqlite3": "^9.6.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.468.0",
@@ -34,6 +33,9 @@
     "uuid": "^9.0.1",
     "zod": "^3.24.1",
     "zustand": "^5.0.2"
+  },
+  "optionalDependencies": {
+    "better-sqlite3": "^9.6.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
