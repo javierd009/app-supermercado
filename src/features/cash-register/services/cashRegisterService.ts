@@ -1,4 +1,4 @@
-import { databaseAdapter } from '@/lib/database';
+import { createClient } from '@/lib/supabase/client';
 import type {
   CashRegister,
   OpenCashRegisterInput,
@@ -28,20 +28,28 @@ interface SaleRow {
 }
 
 class CashRegisterService {
+  private supabase = createClient();
+
   /**
    * Obtener caja abierta del usuario actual
+   * Usa Supabase API directamente para compatibilidad con frontend web
    */
   async getOpenRegister(userId: string): Promise<CashRegister | null> {
     try {
       console.log('[CashRegisterService] Buscando caja abierta para usuario:', userId);
 
-      const registers = await databaseAdapter.query<CashRegisterRow>(
-        `SELECT * FROM cash_registers
-         WHERE user_id = ? AND status = 'open'
-         ORDER BY opened_at DESC
-         LIMIT 1`,
-        [userId]
-      );
+      const { data: registers, error } = await this.supabase
+        .from('cash_registers')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('status', 'open')
+        .order('opened_at', { ascending: false })
+        .limit(1);
+
+      if (error) {
+        console.error('[CashRegisterService] Error Supabase:', error);
+        throw error;
+      }
 
       if (!registers || registers.length === 0) {
         console.log('[CashRegisterService] No hay caja abierta');
@@ -50,7 +58,7 @@ class CashRegisterService {
 
       console.log('[CashRegisterService] ✅ Caja abierta encontrada:', registers[0].id);
 
-      return this.mapToCashRegister(registers[0]);
+      return this.mapToCashRegister(registers[0] as CashRegisterRow);
     } catch (error) {
       console.error('Get open register error:', error);
       return null;
@@ -59,6 +67,7 @@ class CashRegisterService {
 
   /**
    * Abrir nueva caja
+   * Usa Supabase API directamente para compatibilidad con frontend web
    */
   async openRegister(
     input: OpenCashRegisterInput
@@ -86,7 +95,15 @@ class CashRegisterService {
         opened_at: now,
       };
 
-      await databaseAdapter.insert('cash_registers', registerData);
+      // Insertar usando Supabase
+      const { error } = await this.supabase
+        .from('cash_registers')
+        .insert(registerData);
+
+      if (error) {
+        console.error('[CashRegisterService] Error abriendo caja:', error);
+        throw error;
+      }
 
       console.log('[CashRegisterService] ✅ Caja abierta:', registerId);
 
@@ -112,6 +129,7 @@ class CashRegisterService {
 
   /**
    * Cerrar caja
+   * Usa Supabase API directamente para compatibilidad con frontend web
    */
   async closeRegister(
     input: CloseCashRegisterInput
@@ -124,21 +142,35 @@ class CashRegisterService {
       const difference = input.finalAmount - expectedAmount;
       const now = new Date().toISOString();
 
-      // Actualizar caja como cerrada usando databaseAdapter.update
-      await databaseAdapter.update('cash_registers', input.registerId, {
-        closed_at: now,
-        final_amount: input.finalAmount,
-        expected_amount: expectedAmount,
-        difference: difference,
-        notes: input.notes || null,
-        status: 'closed',
-      });
+      // Actualizar caja como cerrada usando Supabase
+      const { error: updateError } = await this.supabase
+        .from('cash_registers')
+        .update({
+          closed_at: now,
+          final_amount: input.finalAmount,
+          expected_amount: expectedAmount,
+          difference: difference,
+          notes: input.notes || null,
+          status: 'closed',
+        })
+        .eq('id', input.registerId);
 
-      // Obtener la caja actualizada
-      const updatedRegister = await databaseAdapter.query<CashRegisterRow>(
-        'SELECT * FROM cash_registers WHERE id = ? LIMIT 1',
-        [input.registerId]
-      );
+      if (updateError) {
+        console.error('[CashRegisterService] Error cerrando caja:', updateError);
+        throw updateError;
+      }
+
+      // Obtener la caja actualizada usando Supabase
+      const { data: updatedRegister, error: fetchError } = await this.supabase
+        .from('cash_registers')
+        .select('*')
+        .eq('id', input.registerId)
+        .limit(1);
+
+      if (fetchError) {
+        console.error('[CashRegisterService] Error obteniendo caja actualizada:', fetchError);
+        throw fetchError;
+      }
 
       if (!updatedRegister || updatedRegister.length === 0) {
         throw new Error('No se pudo obtener la caja actualizada');
@@ -148,7 +180,7 @@ class CashRegisterService {
 
       return {
         success: true,
-        register: this.mapToCashRegister(updatedRegister[0]),
+        register: this.mapToCashRegister(updatedRegister[0] as CashRegisterRow),
       };
     } catch (error: any) {
       console.error('Close register error:', error);
@@ -161,42 +193,54 @@ class CashRegisterService {
 
   /**
    * Obtener resumen de una caja (ventas asociadas)
+   * Usa Supabase API directamente para compatibilidad con frontend web
    */
   async getRegisterSummary(registerId: string): Promise<CashRegisterSummary> {
     try {
-      // Obtener caja
-      const registerRows = await databaseAdapter.query<CashRegisterRow>(
-        'SELECT * FROM cash_registers WHERE id = ? LIMIT 1',
-        [registerId]
-      );
+      // Obtener caja usando Supabase
+      const { data: registerRows, error: registerError } = await this.supabase
+        .from('cash_registers')
+        .select('*')
+        .eq('id', registerId)
+        .limit(1);
+
+      if (registerError) {
+        console.error('[CashRegisterService] Error obteniendo caja:', registerError);
+        throw registerError;
+      }
 
       if (!registerRows || registerRows.length === 0) {
         throw new Error('Caja no encontrada');
       }
 
-      // Obtener ventas de esta caja
-      const sales = await databaseAdapter.query<SaleRow>(
-        'SELECT id, total, payment_method FROM sales WHERE cash_register_id = ?',
-        [registerId]
-      );
+      // Obtener ventas de esta caja usando Supabase
+      const { data: sales, error: salesError } = await this.supabase
+        .from('sales')
+        .select('id, total, payment_method')
+        .eq('cash_register_id', registerId);
+
+      if (salesError) {
+        console.error('[CashRegisterService] Error obteniendo ventas:', salesError);
+        throw salesError;
+      }
 
       // Calcular totales por método de pago
-      const totalCash = sales
-        ?.filter((s) => s.payment_method === 'cash')
-        .reduce((sum, s) => sum + parseFloat(String(s.total)), 0) || 0;
+      const totalCash = (sales || [])
+        .filter((s) => s.payment_method === 'cash')
+        .reduce((sum, s) => sum + parseFloat(String(s.total)), 0);
 
-      const totalCard = sales
-        ?.filter((s) => s.payment_method === 'card')
-        .reduce((sum, s) => sum + parseFloat(String(s.total)), 0) || 0;
+      const totalCard = (sales || [])
+        .filter((s) => s.payment_method === 'card')
+        .reduce((sum, s) => sum + parseFloat(String(s.total)), 0);
 
-      const totalSinpe = sales
-        ?.filter((s) => s.payment_method === 'sinpe')
-        .reduce((sum, s) => sum + parseFloat(String(s.total)), 0) || 0;
+      const totalSinpe = (sales || [])
+        .filter((s) => s.payment_method === 'sinpe')
+        .reduce((sum, s) => sum + parseFloat(String(s.total)), 0);
 
       const totalSales = totalCash + totalCard + totalSinpe;
 
       return {
-        register: this.mapToCashRegister(registerRows[0]),
+        register: this.mapToCashRegister(registerRows[0] as CashRegisterRow),
         totalSales,
         totalCash,
         totalCard,
@@ -219,18 +263,23 @@ class CashRegisterService {
 
   /**
    * Obtener historial de cajas del usuario
+   * Usa Supabase API directamente para compatibilidad con frontend web
    */
   async getUserRegisters(userId: string, limit: number = 10): Promise<CashRegister[]> {
     try {
-      const registers = await databaseAdapter.query<CashRegisterRow>(
-        `SELECT * FROM cash_registers
-         WHERE user_id = ?
-         ORDER BY opened_at DESC
-         LIMIT ?`,
-        [userId, limit]
-      );
+      const { data: registers, error } = await this.supabase
+        .from('cash_registers')
+        .select('*')
+        .eq('user_id', userId)
+        .order('opened_at', { ascending: false })
+        .limit(limit);
 
-      return (registers || []).map(this.mapToCashRegister);
+      if (error) {
+        console.error('[CashRegisterService] Error obteniendo historial:', error);
+        throw error;
+      }
+
+      return (registers || []).map((r) => this.mapToCashRegister(r as CashRegisterRow));
     } catch (error) {
       console.error('Get user registers error:', error);
       return [];
@@ -251,22 +300,29 @@ class CashRegisterService {
       expectedAmount: data.expected_amount ? parseFloat(String(data.expected_amount)) : null,
       difference: data.difference ? parseFloat(String(data.difference)) : null,
       notes: data.notes,
-      status: data.status,
+      status: data.status as 'open' | 'closed',
       exchangeRate: parseFloat(String(data.exchange_rate)) || 570,
     };
   }
 
   /**
    * Actualizar tipo de cambio de la caja abierta (solo super_admin)
+   * Usa Supabase API directamente para compatibilidad con frontend web
    */
   async updateExchangeRate(
     registerId: string,
     newExchangeRate: number
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      await databaseAdapter.update('cash_registers', registerId, {
-        exchange_rate: newExchangeRate,
-      });
+      const { error } = await this.supabase
+        .from('cash_registers')
+        .update({ exchange_rate: newExchangeRate })
+        .eq('id', registerId);
+
+      if (error) {
+        console.error('[CashRegisterService] Error actualizando tipo de cambio:', error);
+        throw error;
+      }
 
       console.log('[CashRegisterService] ✅ Tipo de cambio actualizado:', registerId, newExchangeRate);
 
