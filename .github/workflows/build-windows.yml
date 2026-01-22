@@ -1,0 +1,63 @@
+name: Build Windows Installer
+
+on:
+  workflow_dispatch:  # Permite ejecutar manualmente desde GitHub
+  push:
+    tags:
+      - 'v*'  # Se ejecuta cuando creas un tag como v1.0.0
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Next.js
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
+      - name: Build Windows Installer
+        run: npx electron-builder --win
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sabrosita-POS-Windows-Installer
+          path: dist/*.exe
+          retention-days: 30
+
+  # Crear Release automático cuando hay tag
+  release:
+    needs: build-windows
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Sabrosita-POS-Windows-Installer
+          path: ./installer
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./installer/*.exe
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
