@@ -8,6 +8,7 @@ import { useCreateProduct, useUpdateProduct } from '../hooks/useProducts';
 import type { Product } from '../types';
 import { TaxRateSelector } from '@/features/tax/components/TaxRateSelector';
 import { calculateTaxFromTotal, calculateTaxFromSubtotal } from '@/features/tax/utils/taxCalculations';
+import { CABYSSearch } from './CABYSSearch';
 
 interface ProductFormProps {
   product?: Product | null;
@@ -28,7 +29,13 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
     stock: '',
     minStock: '10',
     taxRate: 13, // Default: IVA general
+    // Campos para Facturación Electrónica
+    cabysCode: '',
+    unitMeasure: 'Unid',
+    commercialCode: '',
   });
+
+  const [showFEFields, setShowFEFields] = useState(false); // Mostrar campos de FE
 
   const [priceIncludesTax, setPriceIncludesTax] = useState(true); // Modo de cálculo de IVA
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -46,7 +53,15 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
         stock: product.stock.toString(),
         minStock: product.minStock.toString(),
         taxRate: product.taxRate,
+        // Campos para Facturación Electrónica
+        cabysCode: product.cabysCode || '',
+        unitMeasure: product.unitMeasure || 'Unid',
+        commercialCode: product.commercialCode || '',
       });
+      // Mostrar campos de FE si el producto ya tiene código CABYS
+      if (product.cabysCode) {
+        setShowFEFields(true);
+      }
     }
   }, [product]);
 
@@ -56,6 +71,15 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: '' }));
     }
+  };
+
+  // Manejar selección de código CABYS
+  const handleCABYSSelect = (result: { codigo: string; impuesto: number; descripcion: string }) => {
+    setFormData((prev) => ({
+      ...prev,
+      cabysCode: result.codigo,
+      taxRate: result.impuesto, // Asignar IVA automáticamente del catálogo oficial
+    }));
   };
 
   const validate = (): boolean => {
@@ -115,6 +139,10 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
         stock: parseInt(formData.stock, 10),
         minStock: parseInt(formData.minStock, 10) || 10,
         taxRate: formData.taxRate,
+        // Campos para Facturación Electrónica (solo si tienen valor)
+        cabysCode: formData.cabysCode.trim() || undefined,
+        unitMeasure: formData.unitMeasure || undefined,
+        commercialCode: formData.commercialCode.trim() || undefined,
       };
 
       let result;
@@ -446,6 +474,135 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
               </div>
             </div>
           )}
+
+          {/* Sección de Facturación Electrónica (colapsable) */}
+          <div className="border border-white/10 rounded-xl overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setShowFEFields(!showFEFields)}
+              className="w-full flex items-center justify-between px-4 py-3 bg-white/5 hover:bg-white/10 transition-all"
+            >
+              <div className="flex items-center">
+                <svg className="h-5 w-5 text-violet-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span className="text-sm font-bold text-white uppercase tracking-wide">
+                  Facturación Electrónica
+                </span>
+                <span className="ml-2 text-xs text-slate-500">(Opcional)</span>
+              </div>
+              <svg
+                className={`h-5 w-5 text-slate-400 transition-transform ${showFEFields ? 'rotate-180' : ''}`}
+                fill="none" viewBox="0 0 24 24" stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {showFEFields && (
+              <div className="p-4 space-y-4 bg-violet-500/5 border-t border-white/10">
+                <p className="text-xs text-slate-400 mb-3">
+                  Busca el código CABYS del producto. Al seleccionar uno, se asignará automáticamente el IVA correcto.
+                </p>
+
+                {/* Buscador de CABYS */}
+                <CABYSSearch
+                  onSelect={handleCABYSSelect}
+                  currentCode={formData.cabysCode}
+                  disabled={isSubmitting}
+                />
+
+                {/* Mostrar código seleccionado con validación */}
+                {formData.cabysCode && (
+                  <div className={`rounded-lg p-3 ${
+                    formData.cabysCode.length === 13
+                      ? 'bg-emerald-500/10 border border-emerald-500/30'
+                      : 'bg-amber-500/10 border border-amber-500/30'
+                  }`}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-slate-400">Código CABYS asignado:</p>
+                        <p className="font-mono text-lg font-bold text-white">{formData.cabysCode}</p>
+                      </div>
+                      {formData.cabysCode.length === 13 ? (
+                        <svg className="h-6 w-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      ) : (
+                        <span className="text-xs text-amber-400">
+                          ({formData.cabysCode.length}/13 dígitos)
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <div className="grid gap-4 md:grid-cols-2">
+
+                  {/* Unidad de Medida */}
+                  <div className="space-y-2">
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide">
+                      Unidad de Medida
+                    </label>
+                    <select
+                      value={formData.unitMeasure}
+                      onChange={(e) => handleChange('unitMeasure', e.target.value)}
+                      disabled={isSubmitting}
+                      className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white transition-all focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20 disabled:opacity-50"
+                    >
+                      <option value="Unid">Unid - Unidad</option>
+                      <option value="Kg">Kg - Kilogramo</option>
+                      <option value="g">g - Gramo</option>
+                      <option value="Lt">Lt - Litro</option>
+                      <option value="ml">ml - Mililitro</option>
+                      <option value="m">m - Metro</option>
+                      <option value="cm">cm - Centímetro</option>
+                      <option value="m2">m² - Metro cuadrado</option>
+                      <option value="m3">m³ - Metro cúbico</option>
+                      <option value="Sp">Sp - Servicio Profesional</option>
+                      <option value="Os">Os - Otro (especificar)</option>
+                    </select>
+                    <p className="text-xs text-slate-500">
+                      Unidad para factura electrónica
+                    </p>
+                  </div>
+                </div>
+
+                {/* Código Comercial */}
+                <div className="space-y-2">
+                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide">
+                    Código Comercial (Opcional)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Código interno para factura electrónica"
+                    value={formData.commercialCode}
+                    onChange={(e) => handleChange('commercialCode', e.target.value)}
+                    disabled={isSubmitting}
+                    className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-slate-500 transition-all focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/20 disabled:opacity-50"
+                  />
+                  <p className="text-xs text-slate-500">
+                    Si no se especifica, se usa el código de barras
+                  </p>
+                </div>
+
+                {/* Link a consultar CABYS */}
+                <div className="flex items-center gap-2 pt-2">
+                  <a
+                    href="https://www.bccr.fi.cr/seccion-indicadores-economicos/servicios-web/cabys"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-violet-400 hover:text-violet-300 underline flex items-center"
+                  >
+                    <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    Consultar catálogo CABYS (BCCR)
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
 
           <div className="grid gap-5 md:gap-6 md:grid-cols-2">
             <div className="space-y-2">
