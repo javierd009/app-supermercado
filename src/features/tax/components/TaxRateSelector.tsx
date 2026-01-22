@@ -1,6 +1,6 @@
 'use client';
 
-import { TAX_RATES, getTaxRateLabel } from '../utils/taxCalculations';
+import { TAX_RATE_OPTIONS } from '../utils/taxCalculations';
 
 interface TaxRateSelectorProps {
   value: number;
@@ -8,27 +8,22 @@ interface TaxRateSelectorProps {
   disabled?: boolean;
 }
 
+// Colores para cada tasa de IVA
+const rateColors: Record<number, string> = {
+  0: 'border-green-400 bg-green-50 hover:bg-green-100',    // Exento
+  1: 'border-emerald-400 bg-emerald-50 hover:bg-emerald-100', // CBT
+  2: 'border-teal-400 bg-teal-50 hover:bg-teal-100',       // Reducido 2%
+  4: 'border-blue-400 bg-blue-50 hover:bg-blue-100',       // Reducido 4%
+  13: 'border-orange-400 bg-orange-50 hover:bg-orange-100', // General
+};
+
 export function TaxRateSelector({ value, onChange, disabled }: TaxRateSelectorProps) {
-  const options = [
-    { 
-      value: TAX_RATES.EXEMPT, 
-      label: '0% - Exento', 
-      description: 'Canasta básica (arroz, frijoles, aceite, azúcar, sal, huevos, leche, pan)',
-      color: 'border-green-400 bg-green-50 hover:bg-green-100'
-    },
-    { 
-      value: TAX_RATES.REDUCED, 
-      label: '4% - Reducido', 
-      description: 'Medicamentos con receta médica',
-      color: 'border-blue-400 bg-blue-50 hover:bg-blue-100'
-    },
-    { 
-      value: TAX_RATES.STANDARD, 
-      label: '13% - General', 
-      description: 'Mayoría de productos (gaseosas, snacks, procesados, limpieza)',
-      color: 'border-orange-400 bg-orange-50 hover:bg-orange-100'
-    },
-  ];
+  const options = TAX_RATE_OPTIONS.map(opt => ({
+    value: opt.value,
+    label: opt.label,
+    description: opt.description,
+    color: rateColors[opt.value] || 'border-gray-400 bg-gray-50 hover:bg-gray-100'
+  }));
 
   return (
     <div className="space-y-2">

@@ -1,12 +1,27 @@
 /**
  * Utilidades para cálculos de IVA según legislación de Costa Rica
- * Ley N° 6826 del Impuesto sobre las Ventas
+ * Ley N° 9635 - Ley de Fortalecimiento de las Finanzas Públicas
+ * Decreto 43790-H - Canasta Básica Tributaria
  */
 
 export const TAX_RATES = {
-  EXEMPT: 0.00,      // Canasta básica (arroz, frijoles, aceite, azúcar, sal, huevos, leche, pan)
-  REDUCED: 4.00,     // Medicamentos con receta médica
-  STANDARD: 13.00,   // General (mayoría de productos)
+  EXEMPT: 0.00,           // Completamente exento (educación, salud, exportaciones)
+  CBT: 1.00,              // Canasta Básica Tributaria (arroz, frijoles, aceite, azúcar, sal, huevos, leche, pan, maíz)
+  REDUCED_2: 2.00,        // Reducido especial (algunos insumos agrícolas)
+  REDUCED_4: 4.00,        // Reducido (medicamentos con receta, boletos aéreos)
+  STANDARD: 13.00,        // General (mayoría de productos)
+} as const;
+
+/**
+ * Códigos de tarifa de IVA según Hacienda (para factura electrónica)
+ * Estos códigos se usan en el XML de factura electrónica
+ */
+export const TAX_RATE_CODES = {
+  [TAX_RATES.EXEMPT]: '01',      // Tarifa 0% (Exento)
+  [TAX_RATES.CBT]: '08',         // Tarifa 1% (Canasta Básica Tributaria)
+  [TAX_RATES.REDUCED_2]: '02',   // Tarifa 2% (Reducido)
+  [TAX_RATES.REDUCED_4]: '03',   // Tarifa 4% (Reducido)
+  [TAX_RATES.STANDARD]: '08',    // Tarifa 13% (General) - Código 08 para IVA general
 } as const;
 
 export type TaxRateValue = typeof TAX_RATES[keyof typeof TAX_RATES];
@@ -41,7 +56,7 @@ export interface SaleTaxBreakdown {
  */
 export function calculateTaxFromTotal(
   priceWithTax: number,
-  taxRate: TaxRateValue
+  taxRate: number
 ): TaxCalculation {
   if (taxRate === 0) {
     return {
@@ -72,7 +87,7 @@ export function calculateTaxFromTotal(
  */
 export function calculateTaxFromSubtotal(
   priceBeforeTax: number,
-  taxRate: TaxRateValue
+  taxRate: number
 ): TaxCalculation {
   const taxAmount = (priceBeforeTax * taxRate) / 100;
   const total = priceBeforeTax + taxAmount;
@@ -119,7 +134,13 @@ export function calculateSaleTaxBreakdown(items: SaleItemWithTax[]): SaleTaxBrea
  * Valida que una tasa de IVA sea válida según legislación de Costa Rica
  */
 export function isValidTaxRate(rate: number): rate is TaxRateValue {
-  return rate === TAX_RATES.EXEMPT || rate === TAX_RATES.REDUCED || rate === TAX_RATES.STANDARD;
+  return (
+    rate === TAX_RATES.EXEMPT ||
+    rate === TAX_RATES.CBT ||
+    rate === TAX_RATES.REDUCED_2 ||
+    rate === TAX_RATES.REDUCED_4 ||
+    rate === TAX_RATES.STANDARD
+  );
 }
 
 /**
@@ -128,12 +149,47 @@ export function isValidTaxRate(rate: number): rate is TaxRateValue {
 export function getTaxRateLabel(rate: number): string {
   switch (rate) {
     case TAX_RATES.EXEMPT:
-      return '0% - Exento (Canasta Básica)';
-    case TAX_RATES.REDUCED:
+      return '0% - Exento';
+    case TAX_RATES.CBT:
+      return '1% - Canasta Básica';
+    case TAX_RATES.REDUCED_2:
+      return '2% - Reducido Especial';
+    case TAX_RATES.REDUCED_4:
       return '4% - Reducido (Medicamentos)';
     case TAX_RATES.STANDARD:
       return '13% - General';
     default:
-      return `${rate}% - Personalizado`;
+      return `${rate}%`;
   }
+}
+
+/**
+ * Obtiene el código de tarifa para factura electrónica
+ */
+export function getTaxRateCode(rate: number): string {
+  const code = TAX_RATE_CODES[rate as keyof typeof TAX_RATE_CODES];
+  return code || '08'; // Por defecto, tarifa general
+}
+
+/**
+ * Lista de tasas disponibles para selección en UI
+ */
+export const TAX_RATE_OPTIONS = [
+  { value: TAX_RATES.EXEMPT, label: '0% - Exento', description: 'Educación, salud, exportaciones' },
+  { value: TAX_RATES.CBT, label: '1% - Canasta Básica', description: 'Arroz, frijoles, aceite, azúcar, leche, huevos, pan' },
+  { value: TAX_RATES.REDUCED_2, label: '2% - Reducido Especial', description: 'Insumos agrícolas específicos' },
+  { value: TAX_RATES.REDUCED_4, label: '4% - Reducido', description: 'Medicamentos con receta' },
+  { value: TAX_RATES.STANDARD, label: '13% - General', description: 'Mayoría de productos y servicios' },
+];
+
+/**
+ * Formatea un monto en colones costarricenses
+ */
+export function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat('es-CR', {
+    style: 'currency',
+    currency: 'CRC',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
 }

@@ -7,7 +7,11 @@ export interface Product {
   price: number;
   stock: number;
   minStock: number;
-  taxRate: number;  // Tasa de IVA (0, 4, o 13)
+  taxRate: number;  // Tasa de IVA (0, 1, 2, 4, o 13)
+  // Campos para Facturación Electrónica
+  cabysCode?: string;       // Código CABYS de 13 dígitos
+  unitMeasure?: string;     // Unidad de medida (Unid, Kg, Lt, etc.)
+  commercialCode?: string;  // Código comercial interno para FE
   createdAt: string;
   updatedAt: string;
 }
@@ -21,6 +25,10 @@ export interface CreateProductInput {
   stock: number;
   minStock?: number;
   taxRate?: number;  // Tasa de IVA (default 13)
+  // Campos para Facturación Electrónica
+  cabysCode?: string;       // Código CABYS de 13 dígitos
+  unitMeasure?: string;     // Unidad de medida (default: Unid)
+  commercialCode?: string;  // Código comercial interno para FE
 }
 
 export interface UpdateProductInput extends Partial<CreateProductInput> {
