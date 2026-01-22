@@ -70,11 +70,21 @@
     ],
     "win": {
       "target": "nsis",
-      "icon": "electron/icon.png"
+      "icon": "electron/icon-256.png"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "electron/icon-256.png"
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "electron/icon-256.png",
+      "uninstallerIcon": "electron/icon-256.png",
+      "installerHeaderIcon": "electron/icon-256.png",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Sabrosita POS"
     }
   }
 }
