@@ -53,6 +53,8 @@ export default function DashboardPage() {
   // Cargar ventas del día
   useEffect(() => {
     const loadTodaySales = async () => {
+      if (!user?.id) return; // Esperar a que cargue el usuario
+
       setIsLoadingSales(true);
       try {
         const supabase = createClient();
@@ -62,12 +64,21 @@ export default function DashboardPage() {
         const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
         const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
 
-        const { data, error } = await supabase
+        // Construir query base
+        let query = supabase
           .from('sales')
           .select('total')
           .gte('created_at', startOfDay.toISOString())
           .lte('created_at', endOfDay.toISOString())
           .is('canceled_at', null);  // Solo ventas no canceladas
+
+        // Si es cajero, solo mostrar sus propias ventas
+        // Admin y Super Admin ven todas las ventas
+        if (user.role === 'cashier') {
+          query = query.eq('user_id', user.id);
+        }
+
+        const { data, error } = await query;
 
         if (error) {
           console.error('Error cargando ventas del día:', error);
@@ -88,7 +99,7 @@ export default function DashboardPage() {
     // Actualizar cada 30 segundos
     const interval = setInterval(loadTodaySales, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [user?.id, user?.role]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-CR', {
@@ -200,7 +211,7 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {[
             {
-              label: 'Ventas del Día',
+              label: user?.role === 'cashier' ? 'Mis Ventas del Día' : 'Ventas Totales del Día',
               value: isLoadingSales ? 'Cargando...' : formatCurrency(todaySales),
               icon: <CircleDollarSign className="w-4 h-4" />,
               grad: 'from-blue-500 to-indigo-600'
