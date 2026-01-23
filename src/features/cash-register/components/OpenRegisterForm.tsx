@@ -5,6 +5,7 @@ import { Button } from '@/shared/components/Button';
 import { Input } from '@/shared/components/Input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/components/Card';
 import { AdminAuthModal } from '@/shared/components/AdminAuthModal';
+import { CurrencyInput } from '@/shared/components/CurrencyInput';
 import { useOpenCashRegister } from '../hooks/useCashRegister';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 
@@ -113,12 +114,10 @@ export function OpenRegisterForm({ onSuccess }: OpenRegisterFormProps) {
                   <div className="absolute inset-y-0 left-0 flex items-center pl-4 md:pl-5 pointer-events-none">
                     <span className="text-slate-400 font-bold text-base md:text-lg">₡</span>
                   </div>
-                  <input
-                    type="number"
-                    step="0.01"
-                    placeholder="0.00"
+                  <CurrencyInput
                     value={initialAmount}
-                    onChange={(e) => setInitialAmount(e.target.value)}
+                    onChange={setInitialAmount}
+                    placeholder="0,00"
                     autoFocus
                     required
                     disabled={isSubmitting}
@@ -133,12 +132,10 @@ export function OpenRegisterForm({ onSuccess }: OpenRegisterFormProps) {
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 md:pl-4 pointer-events-none">
                     <span className="text-slate-400 font-bold text-sm md:text-base">$1 =</span>
                   </div>
-                  <input
-                    type="number"
-                    step="0.01"
-                    placeholder="570.00"
+                  <CurrencyInput
                     value={exchangeRate}
-                    onChange={(e) => setExchangeRate(e.target.value)}
+                    onChange={setExchangeRate}
+                    placeholder="570,00"
                     required
                     disabled={isSubmitting}
                     className="w-full rounded-xl border-2 border-white/20 bg-white/10 pl-16 md:pl-20 pr-10 md:pr-12 py-4 md:py-5 text-xl md:text-2xl text-white font-bold placeholder-slate-500 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50"

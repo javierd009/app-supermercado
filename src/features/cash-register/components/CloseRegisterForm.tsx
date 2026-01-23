@@ -5,6 +5,7 @@ import { Button } from '@/shared/components/Button';
 import { Input } from '@/shared/components/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/Card';
 import { AdminAuthModal } from '@/shared/components/AdminAuthModal';
+import { CurrencyInput } from '@/shared/components/CurrencyInput';
 import { useCloseCashRegister, useRegisterSummary, useCashRegister } from '../hooks/useCashRegister';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useWindowManager } from '@/features/pos/store/windowManager';
@@ -335,12 +336,10 @@ export function CloseRegisterForm({ onSuccess, onCancel }: CloseRegisterFormProp
               <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
                 <span className="text-slate-400 font-medium">₡</span>
               </div>
-              <input
-                type="number"
-                step="0.01"
-                placeholder="0.00"
+              <CurrencyInput
                 value={finalAmount}
-                onChange={(e) => setFinalAmount(e.target.value)}
+                onChange={setFinalAmount}
+                placeholder="0,00"
                 autoFocus
                 required
                 disabled={isSubmitting}
@@ -348,7 +347,7 @@ export function CloseRegisterForm({ onSuccess, onCancel }: CloseRegisterFormProp
               />
             </div>
             <p className="text-xs text-slate-400">
-              Cuente el efectivo en la caja y registre el monto total
+              Escriba con formato: 100.000,44 (punto para miles, coma para decimales)
             </p>
           </div>
 
