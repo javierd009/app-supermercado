@@ -33,6 +33,7 @@ export interface CashRegisterSummary {
   totalCard: number;
   totalSinpe: number;
   salesCount: number;
+  itemCount: number;  // Total de items vendidos
 }
 
 export interface CashRegisterState {

@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useCashRegisterStore, selectCurrentRegister, selectIsOpen } from '../store/cashRegisterStore';
 import { cashRegisterService } from '../services/cashRegisterService';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import type { OpenCashRegisterInput, CloseCashRegisterInput } from '../types';
+import type { OpenCashRegisterInput, CloseCashRegisterInput, CashRegister } from '../types';
 
 /**
  * Hook principal para cash register
@@ -142,10 +142,11 @@ export function useCloseCashRegister() {
 export function useRegisterSummary() {
   const { currentRegister } = useCashRegister();
 
-  const getSummary = async () => {
-    if (!currentRegister) return null;
+  const getSummary = async (registerId?: string) => {
+    const idToUse = registerId || currentRegister?.id;
+    if (!idToUse) return null;
 
-    return await cashRegisterService.getRegisterSummary(currentRegister.id);
+    return await cashRegisterService.getRegisterSummary(idToUse);
   };
 
   return { getSummary };
@@ -196,4 +197,51 @@ export function useUpdateExchangeRate() {
   };
 
   return { updateExchangeRate };
+}
+
+/**
+ * Hook para administradores - ver todas las cajas abiertas
+ */
+export function useAllOpenRegisters() {
+  const [registers, setRegisters] = useState<Array<CashRegister & { username?: string }>>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadAllOpenRegisters = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const data = await cashRegisterService.getAllOpenRegisters();
+      setRegisters(data);
+    } catch (err: any) {
+      setError(err.message || 'Error al cargar cajas abiertas');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { registers, isLoading, error, loadAllOpenRegisters };
+}
+
+/**
+ * Hook para administradores - cerrar cualquier caja
+ */
+export function useAdminCloseRegister() {
+  const { user } = useAuth();
+
+  const adminCloseRegister = async (
+    registerId: string,
+    finalAmount: number,
+    notes?: string
+  ) => {
+    return await cashRegisterService.adminCloseRegister(
+      registerId,
+      finalAmount,
+      notes,
+      user?.id
+    );
+  };
+
+  return { adminCloseRegister };
 }

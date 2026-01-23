@@ -5,6 +5,7 @@ import { useCashRegister, useLoadCurrentRegister } from '@/features/cash-registe
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { configService } from '@/features/settings/services/configService';
+import { createClient } from '@/lib/supabase/client';
 import {
   CircleDollarSign,
   Package,
@@ -30,6 +31,8 @@ export default function DashboardPage() {
 
   const [currentTime, setCurrentTime] = useState(new Date());
   const [businessName, setBusinessName] = useState('Sabrosita POS');
+  const [todaySales, setTodaySales] = useState<number>(0);
+  const [isLoadingSales, setIsLoadingSales] = useState(true);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -46,6 +49,54 @@ export default function DashboardPage() {
     };
     loadBusinessName();
   }, []);
+
+  // Cargar ventas del día
+  useEffect(() => {
+    const loadTodaySales = async () => {
+      setIsLoadingSales(true);
+      try {
+        const supabase = createClient();
+
+        // Obtener inicio y fin del día actual en zona horaria local
+        const today = new Date();
+        const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
+        const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+
+        const { data, error } = await supabase
+          .from('sales')
+          .select('total')
+          .gte('created_at', startOfDay.toISOString())
+          .lte('created_at', endOfDay.toISOString())
+          .is('canceled_at', null);  // Solo ventas no canceladas
+
+        if (error) {
+          console.error('Error cargando ventas del día:', error);
+          return;
+        }
+
+        const total = (data || []).reduce((sum, sale) => sum + parseFloat(String(sale.total)), 0);
+        setTodaySales(total);
+      } catch (err) {
+        console.error('Error cargando ventas del día:', err);
+      } finally {
+        setIsLoadingSales(false);
+      }
+    };
+
+    loadTodaySales();
+
+    // Actualizar cada 30 segundos
+    const interval = setInterval(loadTodaySales, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('es-CR', {
+      style: 'currency',
+      currency: 'CRC',
+      minimumFractionDigits: 2,
+    }).format(amount);
+  };
 
   const menuItems = [
     {
@@ -148,8 +199,18 @@ export default function DashboardPage() {
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {[
-            { label: 'Ventas del Día', value: '₡0.00', icon: <CircleDollarSign className="w-4 h-4" />, grad: 'from-blue-500 to-indigo-600' },
-            { label: 'Estado de Caja', value: currentRegister ? 'Abierta' : 'Cerrada', icon: <Wallet className="w-4 h-4" />, grad: currentRegister ? 'from-emerald-500 to-emerald-600' : 'from-slate-500 to-slate-600' },
+            {
+              label: 'Ventas del Día',
+              value: isLoadingSales ? 'Cargando...' : formatCurrency(todaySales),
+              icon: <CircleDollarSign className="w-4 h-4" />,
+              grad: 'from-blue-500 to-indigo-600'
+            },
+            {
+              label: 'Estado de Caja',
+              value: currentRegister ? 'Abierta' : 'Cerrada',
+              icon: <Wallet className="w-4 h-4" />,
+              grad: currentRegister ? 'from-emerald-500 to-emerald-600' : 'from-slate-500 to-slate-600'
+            },
           ].map((stat, i) => (
             <div key={i} className="bg-white/5 p-5 rounded-xl border border-white/5 hover:bg-white/[0.08] transition-all">
               <div className={`p-3 bg-gradient-to-tr ${stat.grad} rounded-lg text-white shadow-lg mb-4 inline-flex`}>
@@ -247,6 +308,30 @@ export default function DashboardPage() {
                   </p>
 
                   <div className="flex items-center text-[9px] font-bold text-slate-500 uppercase tracking-wide mt-4 pt-4 border-t border-white/5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    Acceder <ChevronRight className="w-3 h-3 ml-1" />
+                  </div>
+                </div>
+              </Link>
+
+              <Link href="/admin/registers" className="group">
+                <div className="bg-white/5 rounded-xl p-6 border border-white/5 hover:bg-white/[0.08] hover:border-white/10 transition-all">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="p-3 rounded-lg bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600 text-white">
+                      <Landmark className="w-5 h-5" />
+                    </div>
+                    <div className="p-2 rounded-lg bg-white/5 text-slate-600 group-hover:bg-amber-500 group-hover:text-white transition-all">
+                      <ArrowUpRight className="w-4 h-4" />
+                    </div>
+                  </div>
+
+                  <h3 className="text-xl font-black text-white group-hover:text-amber-400 transition-colors mb-2 uppercase">
+                    Gestión de Cajas
+                  </h3>
+                  <p className="text-slate-500 font-medium text-sm">
+                    Ver y cerrar cajas de usuarios
+                  </p>
+
+                  <div className="flex items-center text-[9px] font-bold text-amber-500 uppercase tracking-wide mt-4 pt-4 border-t border-white/5 opacity-0 group-hover:opacity-100 transition-opacity">
                     Acceder <ChevronRight className="w-3 h-3 ml-1" />
                   </div>
                 </div>

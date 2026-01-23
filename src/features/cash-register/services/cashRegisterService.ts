@@ -28,7 +28,13 @@ interface SaleRow {
 }
 
 class CashRegisterService {
-  private supabase = createClient();
+  /**
+   * Get a fresh Supabase client for each operation
+   * This ensures the auth token is always current
+   */
+  private getClient() {
+    return createClient();
+  }
 
   /**
    * Obtener caja abierta del usuario actual
@@ -38,7 +44,7 @@ class CashRegisterService {
     try {
       console.log('[CashRegisterService] Buscando caja abierta para usuario:', userId);
 
-      const { data: registers, error } = await this.supabase
+      const { data: registers, error } = await this.getClient()
         .from('cash_registers')
         .select('*')
         .eq('user_id', userId)
@@ -96,7 +102,7 @@ class CashRegisterService {
       };
 
       // Insertar usando Supabase
-      const { error } = await this.supabase
+      const { error } = await this.getClient()
         .from('cash_registers')
         .insert(registerData);
 
@@ -135,15 +141,30 @@ class CashRegisterService {
     input: CloseCashRegisterInput
   ): Promise<{ success: boolean; register?: CashRegister; error?: string }> {
     try {
+      console.log('[CashRegisterService] Iniciando cierre de caja:', input.registerId);
+
       // Obtener resumen de ventas de esta caja
       const summary = await this.getRegisterSummary(input.registerId);
+
+      if (!summary.register || !summary.register.id) {
+        console.error('[CashRegisterService] Caja no encontrada en resumen');
+        throw new Error('Caja no encontrada');
+      }
 
       const expectedAmount = summary.register.initialAmount + summary.totalCash;
       const difference = input.finalAmount - expectedAmount;
       const now = new Date().toISOString();
 
-      // Actualizar caja como cerrada usando Supabase
-      const { error: updateError } = await this.supabase
+      console.log('[CashRegisterService] Datos de cierre:', {
+        registerId: input.registerId,
+        finalAmount: input.finalAmount,
+        expectedAmount,
+        difference,
+        now,
+      });
+
+      // Actualizar caja como cerrada usando Supabase con .select() para obtener el resultado
+      const { data: updatedData, error: updateError } = await this.getClient()
         .from('cash_registers')
         .update({
           closed_at: now,
@@ -153,37 +174,40 @@ class CashRegisterService {
           notes: input.notes || null,
           status: 'closed',
         })
-        .eq('id', input.registerId);
+        .eq('id', input.registerId)
+        .select();
 
       if (updateError) {
         console.error('[CashRegisterService] Error cerrando caja:', updateError);
         throw updateError;
       }
 
-      // Obtener la caja actualizada usando Supabase
-      const { data: updatedRegister, error: fetchError } = await this.supabase
-        .from('cash_registers')
-        .select('*')
-        .eq('id', input.registerId)
-        .limit(1);
-
-      if (fetchError) {
-        console.error('[CashRegisterService] Error obteniendo caja actualizada:', fetchError);
-        throw fetchError;
+      // Verificar que el update afectó al menos una fila
+      if (!updatedData || updatedData.length === 0) {
+        console.error('[CashRegisterService] Update no afectó ninguna fila. ID:', input.registerId);
+        throw new Error('No se pudo actualizar la caja. Verifique que la caja existe.');
       }
 
-      if (!updatedRegister || updatedRegister.length === 0) {
-        throw new Error('No se pudo obtener la caja actualizada');
+      const updatedRegister = updatedData[0] as CashRegisterRow;
+
+      // Verificar que el status realmente cambió a 'closed'
+      if (updatedRegister.status !== 'closed') {
+        console.error('[CashRegisterService] Status no se actualizó correctamente:', updatedRegister.status);
+        throw new Error('El estado de la caja no se actualizó correctamente');
       }
 
-      console.log('[CashRegisterService] ✅ Caja cerrada:', input.registerId);
+      console.log('[CashRegisterService] ✅ Caja cerrada exitosamente:', {
+        id: input.registerId,
+        status: updatedRegister.status,
+        closedAt: updatedRegister.closed_at,
+      });
 
       return {
         success: true,
-        register: this.mapToCashRegister(updatedRegister[0] as CashRegisterRow),
+        register: this.mapToCashRegister(updatedRegister),
       };
     } catch (error: any) {
-      console.error('Close register error:', error);
+      console.error('[CashRegisterService] Error en closeRegister:', error);
       return {
         success: false,
         error: error.message || 'Error al cerrar caja',
@@ -198,7 +222,7 @@ class CashRegisterService {
   async getRegisterSummary(registerId: string): Promise<CashRegisterSummary> {
     try {
       // Obtener caja usando Supabase
-      const { data: registerRows, error: registerError } = await this.supabase
+      const { data: registerRows, error: registerError } = await this.getClient()
         .from('cash_registers')
         .select('*')
         .eq('id', registerId)
@@ -214,7 +238,7 @@ class CashRegisterService {
       }
 
       // Obtener ventas de esta caja usando Supabase
-      const { data: sales, error: salesError } = await this.supabase
+      const { data: sales, error: salesError } = await this.getClient()
         .from('sales')
         .select('id, total, payment_method')
         .eq('cash_register_id', registerId);
@@ -239,6 +263,16 @@ class CashRegisterService {
 
       const totalSales = totalCash + totalCard + totalSinpe;
 
+      // Obtener cantidad de items vendidos
+      const { data: saleItems, error: itemsError } = await this.getClient()
+        .from('sale_items')
+        .select('id, sale_id, quantity')
+        .in('sale_id', (sales || []).map(s => s.id));
+
+      const itemCount = itemsError
+        ? 0
+        : (saleItems || []).reduce((sum, item) => sum + (item.quantity || 1), 0);
+
       return {
         register: this.mapToCashRegister(registerRows[0] as CashRegisterRow),
         totalSales,
@@ -246,6 +280,7 @@ class CashRegisterService {
         totalCard,
         totalSinpe,
         salesCount: sales?.length || 0,
+        itemCount,
       };
     } catch (error) {
       console.error('Get register summary error:', error);
@@ -257,6 +292,7 @@ class CashRegisterService {
         totalCard: 0,
         totalSinpe: 0,
         salesCount: 0,
+        itemCount: 0,
       };
     }
   }
@@ -267,7 +303,7 @@ class CashRegisterService {
    */
   async getUserRegisters(userId: string, limit: number = 10): Promise<CashRegister[]> {
     try {
-      const { data: registers, error } = await this.supabase
+      const { data: registers, error } = await this.getClient()
         .from('cash_registers')
         .select('*')
         .eq('user_id', userId)
@@ -283,6 +319,101 @@ class CashRegisterService {
     } catch (error) {
       console.error('Get user registers error:', error);
       return [];
+    }
+  }
+
+  /**
+   * Obtener TODAS las cajas abiertas (solo para admin/super_admin)
+   * Incluye información del usuario que abrió cada caja
+   */
+  async getAllOpenRegisters(): Promise<Array<CashRegister & { username?: string }>> {
+    try {
+      const { data: registers, error } = await this.getClient()
+        .from('cash_registers')
+        .select(`
+          *,
+          users:user_id (username)
+        `)
+        .eq('status', 'open')
+        .order('opened_at', { ascending: false });
+
+      if (error) {
+        console.error('[CashRegisterService] Error obteniendo cajas abiertas:', error);
+        throw error;
+      }
+
+      return (registers || []).map((r: any) => ({
+        ...this.mapToCashRegister(r as CashRegisterRow),
+        username: r.users?.username || 'Usuario desconocido',
+      }));
+    } catch (error) {
+      console.error('Get all open registers error:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Cerrar caja de otro usuario (solo admin/super_admin)
+   * El admin puede cerrar cualquier caja abierta
+   */
+  async adminCloseRegister(
+    registerId: string,
+    finalAmount: number,
+    notes?: string,
+    adminUserId?: string
+  ): Promise<{ success: boolean; register?: CashRegister; error?: string }> {
+    try {
+      console.log('[CashRegisterService] Admin cerrando caja:', registerId);
+
+      // Obtener resumen de ventas de esta caja
+      const summary = await this.getRegisterSummary(registerId);
+
+      if (!summary.register || !summary.register.id) {
+        throw new Error('Caja no encontrada');
+      }
+
+      const expectedAmount = summary.register.initialAmount + summary.totalCash;
+      const difference = finalAmount - expectedAmount;
+      const now = new Date().toISOString();
+
+      const adminNote = adminUserId
+        ? `[Cerrado por admin] ${notes || ''}`.trim()
+        : notes || null;
+
+      // Actualizar caja como cerrada
+      const { data: updatedData, error: updateError } = await this.getClient()
+        .from('cash_registers')
+        .update({
+          closed_at: now,
+          final_amount: finalAmount,
+          expected_amount: expectedAmount,
+          difference: difference,
+          notes: adminNote,
+          status: 'closed',
+        })
+        .eq('id', registerId)
+        .select();
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      if (!updatedData || updatedData.length === 0) {
+        throw new Error('No se pudo actualizar la caja');
+      }
+
+      console.log('[CashRegisterService] ✅ Caja cerrada por admin:', registerId);
+
+      return {
+        success: true,
+        register: this.mapToCashRegister(updatedData[0] as CashRegisterRow),
+      };
+    } catch (error: any) {
+      console.error('[CashRegisterService] Error admin cerrando caja:', error);
+      return {
+        success: false,
+        error: error.message || 'Error al cerrar caja',
+      };
     }
   }
 
@@ -314,7 +445,7 @@ class CashRegisterService {
     newExchangeRate: number
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await this.supabase
+      const { error } = await this.getClient()
         .from('cash_registers')
         .update({ exchange_rate: newExchangeRate })
         .eq('id', registerId);
