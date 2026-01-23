@@ -32,37 +32,70 @@ export default function SalesPage() {
   const { user } = useAuth();
   const [sales, setSales] = useState<Sale[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [salesUsers, setSalesUsers] = useState<{ id: string; username: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedSaleId, setSelectedSaleId] = useState<string | null>(null);
   const [selectedSaleTotal, setSelectedSaleTotal] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [paymentFilter, setPaymentFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [userFilter, setUserFilter] = useState<string>('all');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date());
+
+  const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
+  // Cargar lista de usuarios que han hecho ventas (solo admins)
+  useEffect(() => {
+    if (isAdmin) {
+      salesService.getSalesUsers().then(setSalesUsers);
+    }
+  }, [isAdmin]);
+
+  // Cargar datos cuando cambian los filtros de fecha o usuario
   useEffect(() => {
     loadData();
-    // Auto-refresh cada 10 segundos
+  }, [startDate, endDate, userFilter, user?.id]);
+
+  // Auto-refresh cada 30 segundos
+  useEffect(() => {
     const refreshInterval = setInterval(() => {
       loadData();
-    }, 10000);
-
+    }, 30000);
     return () => clearInterval(refreshInterval);
-  }, []);
+  }, [startDate, endDate, userFilter]);
 
   const loadData = async () => {
+    if (!user?.id) return;
+
     setIsLoading(true);
+
+    // Determinar filtro de usuario
+    let userId: string | undefined;
+    if (!isAdmin) {
+      // Cajeros solo ven sus propias ventas
+      userId = user.id;
+    } else if (userFilter !== 'all') {
+      // Admins pueden filtrar por usuario específico
+      userId = userFilter;
+    }
+
     const [salesData, customersData] = await Promise.all([
-      salesService.getRecentSales(100),
+      salesService.getSalesFiltered({
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+        userId,
+        limit: 500, // Más registros para filtros de fecha amplios
+      }),
       customersService.getAll(),
     ]);
+
     setSales(salesData);
     setCustomers(customersData);
     setIsLoading(false);
@@ -156,8 +189,6 @@ export default function SalesPage() {
     };
     return labels[method] || method;
   };
-
-  const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
 
   // Filtros aplicados
   const filteredSales = sales.filter(sale => {
@@ -325,7 +356,7 @@ export default function SalesPage() {
               Filtros y Búsqueda
             </h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
             {/* Búsqueda */}
             <div className="lg:col-span-1">
               <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">
@@ -403,7 +434,37 @@ export default function SalesPage() {
                 <option value="canceled" className="bg-[#020617] text-white">SOLO ANULADAS</option>
               </select>
             </div>
+
+            {/* Filtro por cajero/usuario - solo para admins */}
+            {isAdmin && (
+              <div>
+                <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">
+                  Cajero / Usuario
+                </label>
+                <select
+                  value={userFilter}
+                  onChange={(e) => setUserFilter(e.target.value)}
+                  className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                >
+                  <option value="all" className="bg-[#020617] text-white">TODOS LOS CAJEROS</option>
+                  {salesUsers.map((u) => (
+                    <option key={u.id} value={u.id} className="bg-[#020617] text-white">
+                      {u.username.toUpperCase()}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
+
+          {/* Indicador de filtro activo para cajeros */}
+          {!isAdmin && (
+            <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+              <p className="text-xs text-blue-400 font-medium">
+                📋 Mostrando solo tus ventas ({user?.username})
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Sales Table */}

@@ -96,11 +96,11 @@ export function POSWindowMulti({ windowId, onClose }: POSWindowMultiProps) {
 
               {/* Logo y Título */}
               <div className="flex items-center gap-2 md:gap-3 min-w-0">
-                <div className="hidden md:block bg-gradient-to-br from-blue-600 to-indigo-700 p-2 rounded-xl shadow-lg flex-shrink-0">
+                <div className="hidden md:block bg-white rounded-xl p-1 shadow-lg flex-shrink-0">
                   <img
                     src="/images/sabrosita-logo.png"
                     alt="La Sabrosita"
-                    className="h-6 w-6 object-contain brightness-0 invert"
+                    className="h-9 w-9 object-contain"
                   />
                 </div>
                 <div className="min-w-0">

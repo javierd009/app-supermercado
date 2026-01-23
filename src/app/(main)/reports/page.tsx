@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { reportsService } from '@/features/reports/services';
+import { salesService } from '@/features/sales/services/salesService';
 import {
   getSalesReportAction,
   getInventoryReportAction,
@@ -25,6 +26,7 @@ import {
   Calendar,
   Package,
   Users,
+  User,
   DollarSign,
   TrendingUp,
   Loader2,
@@ -47,10 +49,29 @@ export default function ReportsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [hasGenerated, setHasGenerated] = useState(false);
 
+  // Filtro por usuario
+  const [userFilter, setUserFilter] = useState<string>('all');
+  const [salesUsers, setSalesUsers] = useState<{ id: string; username: string }[]>([]);
+  const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
+
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // Cargar lista de usuarios que han hecho ventas (solo para admins)
+  useEffect(() => {
+    const loadSalesUsers = async () => {
+      if (!isAdmin) return;
+      try {
+        const users = await salesService.getSalesUsers();
+        setSalesUsers(users);
+      } catch (error) {
+        console.error('Error cargando usuarios:', error);
+      }
+    };
+    loadSalesUsers();
+  }, [isAdmin]);
 
   const applyDatePreset = (preset: DatePreset) => {
     setDatePreset(preset);
@@ -129,9 +150,18 @@ export default function ReportsPage() {
     try {
       let result;
 
+      // Determinar userId para filtrar
+      // Cajeros solo ven sus propias ventas, admins pueden filtrar
+      let userId: string | undefined;
+      if (!isAdmin) {
+        userId = user?.id;
+      } else if (userFilter !== 'all') {
+        userId = userFilter;
+      }
+
       switch (selectedReport) {
         case 'sales':
-          result = await getSalesReportAction(dateFrom, dateTo);
+          result = await getSalesReportAction(dateFrom, dateTo, userId);
           break;
         case 'inventory':
           result = await getInventoryReportAction();
@@ -754,6 +784,40 @@ export default function ReportsPage() {
                       />
                     </div>
                   </>
+                )}
+
+                {/* Filtro por Usuario (solo para reporte de ventas y admins) */}
+                {selectedReport === 'sales' && isAdmin && (
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-wide">
+                      <div className="flex items-center gap-2">
+                        <User className="w-3.5 h-3.5" />
+                        Filtrar por Cajero
+                      </div>
+                    </label>
+                    <select
+                      value={userFilter}
+                      onChange={(e) => setUserFilter(e.target.value)}
+                      className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                    >
+                      <option value="all" className="bg-slate-800">TODOS LOS CAJEROS</option>
+                      {salesUsers.map((u) => (
+                        <option key={u.id} value={u.id} className="bg-slate-800">
+                          {u.username.toUpperCase()}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {/* Indicador para cajeros */}
+                {selectedReport === 'sales' && !isAdmin && (
+                  <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-3">
+                    <div className="flex items-center gap-2 text-blue-400 text-xs font-bold">
+                      <User className="w-3.5 h-3.5" />
+                      <span>Mostrando solo tus ventas</span>
+                    </div>
+                  </div>
                 )}
 
                 {/* Generate Button */}

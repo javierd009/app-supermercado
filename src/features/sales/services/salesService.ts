@@ -340,6 +340,91 @@ class SalesService {
   }
 
   /**
+   * Obtener ventas filtradas por fecha, usuario, etc.
+   * Para la página de historial de ventas con filtros completos
+   */
+  async getSalesFiltered(params: {
+    startDate?: string;
+    endDate?: string;
+    userId?: string;
+    limit?: number;
+  }): Promise<Sale[]> {
+    try {
+      let query = this.supabase
+        .from('sales')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      // Filtro por fecha inicio (zona horaria Costa Rica UTC-6)
+      if (params.startDate) {
+        const start = `${params.startDate}T00:00:00-06:00`;
+        query = query.gte('created_at', start);
+      }
+
+      // Filtro por fecha fin
+      if (params.endDate) {
+        const end = `${params.endDate}T23:59:59-06:00`;
+        query = query.lte('created_at', end);
+      }
+
+      // Filtro por usuario
+      if (params.userId) {
+        query = query.eq('user_id', params.userId);
+      }
+
+      // Límite
+      if (params.limit) {
+        query = query.limit(params.limit);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Get filtered sales error:', error);
+        return [];
+      }
+
+      return (data || []).map(this.mapToSale);
+    } catch (error) {
+      console.error('Get filtered sales error:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Obtener lista de usuarios que han hecho ventas (para filtro)
+   */
+  async getSalesUsers(): Promise<{ id: string; username: string }[]> {
+    try {
+      const { data, error } = await this.supabase
+        .from('sales')
+        .select('user_id, users!user_id(username)')
+        .not('user_id', 'is', null);
+
+      if (error) {
+        console.error('Get sales users error:', error);
+        return [];
+      }
+
+      // Obtener usuarios únicos
+      const usersMap = new Map<string, string>();
+      (data || []).forEach((sale: any) => {
+        if (sale.user_id && sale.users?.username) {
+          usersMap.set(sale.user_id, sale.users.username);
+        }
+      });
+
+      return Array.from(usersMap.entries()).map(([id, username]) => ({
+        id,
+        username,
+      }));
+    } catch (error) {
+      console.error('Get sales users error:', error);
+      return [];
+    }
+  }
+
+  /**
    * Anular/cancelar venta
    */
   async cancelSale(

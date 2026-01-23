@@ -15,10 +15,14 @@ import type {
 
 /**
  * Reporte de Ventas
+ * @param dateFrom - Fecha de inicio (YYYY-MM-DD)
+ * @param dateTo - Fecha de fin (YYYY-MM-DD)
+ * @param userId - ID del usuario para filtrar (opcional, si no se provee muestra todas)
  */
 export async function getSalesReportAction(
   dateFrom: string,
-  dateTo: string
+  dateTo: string,
+  userId?: string
 ): Promise<{ success: boolean; data?: SalesReportRow[]; error?: string }> {
   try {
     const supabase = await createClient();
@@ -28,11 +32,11 @@ export async function getSalesReportAction(
     const startDate = `${dateFrom}T00:00:00-06:00`;
     const endDate = `${dateTo}T23:59:59-06:00`;
 
-    console.log(`[getSalesReportAction] Buscando ventas desde ${startDate} hasta ${endDate}`);
+    console.log(`[getSalesReportAction] Buscando ventas desde ${startDate} hasta ${endDate}${userId ? ` para usuario ${userId}` : ''}`);
 
     // Primero obtener las ventas con sus relaciones (excluyendo canceladas)
     // Nota: Usamos users!user_id para especificar la FK correcta (hay múltiples: user_id y canceled_by)
-    const { data: sales, error: salesError } = await supabase
+    let query = supabase
       .from('sales')
       .select(`
         id,
@@ -48,6 +52,13 @@ export async function getSalesReportAction(
       .lte('created_at', endDate)
       .is('canceled_at', null)
       .order('created_at', { ascending: false });
+
+    // Filtrar por usuario si se especifica
+    if (userId) {
+      query = query.eq('user_id', userId);
+    }
+
+    const { data: sales, error: salesError } = await query;
 
     if (salesError) {
       console.error('[getSalesReportAction] Error:', salesError);
