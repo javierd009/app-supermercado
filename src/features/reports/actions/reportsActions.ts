@@ -23,13 +23,14 @@ export async function getSalesReportAction(
   try {
     const supabase = await createClient();
 
-    // Normalizar fechas para comparación inclusiva
-    const startDate = `${dateFrom}T00:00:00`;
-    const endDate = `${dateTo}T23:59:59`;
+    // Normalizar fechas con zona horaria de Costa Rica (UTC-6)
+    // Esto asegura que "hoy" signifique medianoche a medianoche en Costa Rica
+    const startDate = `${dateFrom}T00:00:00-06:00`;
+    const endDate = `${dateTo}T23:59:59-06:00`;
 
     console.log(`[getSalesReportAction] Buscando ventas desde ${startDate} hasta ${endDate}`);
 
-    // Primero obtener las ventas con sus relaciones
+    // Primero obtener las ventas con sus relaciones (excluyendo canceladas)
     const { data: sales, error: salesError } = await supabase
       .from('sales')
       .select(`
@@ -44,6 +45,7 @@ export async function getSalesReportAction(
       `)
       .gte('created_at', startDate)
       .lte('created_at', endDate)
+      .is('canceled_at', null)
       .order('created_at', { ascending: false });
 
     if (salesError) {
@@ -150,9 +152,9 @@ export async function getCustomersReportAction(
   try {
     const supabase = await createClient();
 
-    // Normalizar fechas
-    const startDate = `${dateFrom}T00:00:00`;
-    const endDate = `${dateTo}T23:59:59`;
+    // Normalizar fechas con zona horaria de Costa Rica (UTC-6)
+    const startDate = `${dateFrom}T00:00:00-06:00`;
+    const endDate = `${dateTo}T23:59:59-06:00`;
 
     // Obtener todos los clientes (excepto Cliente General)
     const { data: customers, error: customersError } = await supabase
@@ -174,7 +176,8 @@ export async function getCustomersReportAction(
         .select('id, total, created_at')
         .eq('customer_id', customer.id)
         .gte('created_at', startDate)
-        .lte('created_at', endDate);
+        .lte('created_at', endDate)
+        .is('canceled_at', null);
 
       if (salesError) continue;
 
@@ -216,16 +219,17 @@ export async function getFinancialReportAction(
   try {
     const supabase = await createClient();
 
-    // Normalizar fechas
-    const startDate = `${dateFrom}T00:00:00`;
-    const endDate = `${dateTo}T23:59:59`;
+    // Normalizar fechas con zona horaria de Costa Rica (UTC-6)
+    const startDate = `${dateFrom}T00:00:00-06:00`;
+    const endDate = `${dateTo}T23:59:59-06:00`;
 
-    // Obtener todas las ventas en el rango
+    // Obtener todas las ventas en el rango (excluyendo canceladas)
     const { data: sales, error: salesError } = await supabase
       .from('sales')
       .select('id, total, created_at')
       .gte('created_at', startDate)
       .lte('created_at', endDate)
+      .is('canceled_at', null)
       .order('created_at', { ascending: true });
 
     if (salesError) {
