@@ -145,21 +145,33 @@ export default function CashRegisterPage() {
       </header>
 
       {/* Action Bar */}
-      <div className="px-6 md:px-8 py-4 border-b border-white/5 bg-white/5 flex items-center justify-end">
+      <div className="px-6 md:px-8 py-4 border-b border-white/5 bg-white/5 flex items-center justify-between">
+        {/* Admin: Gestionar cajas de otros usuarios */}
+        {(user?.role === 'admin' || user?.role === 'super_admin') && (
+          <Link
+            href="/admin/registers"
+            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 px-3 md:px-4 py-2 rounded-xl text-white font-bold text-[10px] md:text-xs uppercase tracking-wide transition-all flex items-center gap-1.5 md:gap-2 shadow-lg"
+          >
+            <User className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Cajas de Usuarios</span>
+            <span className="sm:hidden">Usuarios</span>
+          </Link>
+        )}
+        {!(user?.role === 'admin' || user?.role === 'super_admin') && <div />}
         <div className="flex items-center gap-2">
           <button
             onClick={handleViewHistory}
-            className="bg-white/5 hover:bg-blue-500/20 px-4 py-2 rounded-xl text-blue-400 font-bold text-xs uppercase tracking-wide transition-all border border-white/5 flex items-center gap-2"
+            className="bg-white/5 hover:bg-blue-500/20 px-3 md:px-4 py-2 rounded-xl text-blue-400 font-bold text-[10px] md:text-xs uppercase tracking-wide transition-all border border-white/5 flex items-center gap-1.5 md:gap-2"
           >
             <FileText className="w-3.5 h-3.5" />
-            Historial
+            <span className="hidden sm:inline">Historial</span>
           </button>
           <button
             onClick={handlePrintReport}
-            className="bg-white/5 hover:bg-blue-500/20 px-4 py-2 rounded-xl text-blue-400 font-bold text-xs uppercase tracking-wide transition-all border border-white/5 flex items-center gap-2"
+            className="bg-white/5 hover:bg-blue-500/20 px-3 md:px-4 py-2 rounded-xl text-blue-400 font-bold text-[10px] md:text-xs uppercase tracking-wide transition-all border border-white/5 flex items-center gap-1.5 md:gap-2"
           >
             <Printer className="w-3.5 h-3.5" />
-            Reporte
+            <span className="hidden sm:inline">Reporte</span>
           </button>
         </div>
       </div>

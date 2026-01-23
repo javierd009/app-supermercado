@@ -252,60 +252,60 @@ export function CloseRegisterForm({ onSuccess, onCancel }: CloseRegisterFormProp
           </div>
 
           {/* Ventas por método de pago */}
-          <div className="rounded-xl border border-white/10 bg-white/5 p-5">
-            <h3 className="mb-4 font-bold text-white text-lg flex items-center">
-              <svg className="h-5 w-5 mr-2 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="rounded-xl border border-white/10 bg-white/5 p-4 md:p-5">
+            <h3 className="mb-4 font-bold text-white text-base md:text-lg flex items-center">
+              <svg className="h-5 w-5 mr-2 text-blue-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
               </svg>
               Ventas por Método de Pago
             </h3>
             <div className="space-y-3">
-              <div className="flex justify-between items-center p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
                 <span className="text-emerald-400 font-medium">
                   <span className="inline-flex items-center">
-                    <svg className="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="h-4 w-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                       <circle cx="10" cy="10" r="3" />
                     </svg>
                     Efectivo
                   </span>
-                  <span className="text-xs ml-6">({summary.salesCount} ventas)</span>
+                  <span className="text-xs ml-2">({summary.salesCount} ventas)</span>
                 </span>
-                <span className="font-bold text-emerald-400 text-lg">
+                <span className="font-bold text-emerald-400 text-base md:text-lg tabular-nums">
                   {formatCurrency(summary.totalCash)}
                 </span>
               </div>
-              <div className="flex justify-between items-center p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
                 <span className="text-blue-400 font-medium">
                   <span className="inline-flex items-center">
-                    <svg className="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="h-4 w-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                       <rect x="3" y="5" width="14" height="10" rx="2" />
                     </svg>
                     Tarjeta
                   </span>
                 </span>
-                <span className="font-bold text-blue-400 text-lg">
+                <span className="font-bold text-blue-400 text-base md:text-lg tabular-nums">
                   {formatCurrency(summary.totalCard)}
                 </span>
               </div>
-              <div className="flex justify-between items-center p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
                 <span className="text-amber-400 font-medium">
                   <span className="inline-flex items-center">
-                    <svg className="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="h-4 w-4 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z" />
                     </svg>
                     Sinpe Móvil
                   </span>
                 </span>
-                <span className="font-bold text-amber-400 text-lg">
+                <span className="font-bold text-amber-400 text-base md:text-lg tabular-nums">
                   {formatCurrency(summary.totalSinpe)}
                 </span>
               </div>
               <div className="border-t border-white/10 pt-3 mt-3">
-                <div className="flex justify-between items-center">
-                  <span className="font-bold text-white text-lg">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1">
+                  <span className="font-bold text-white text-sm md:text-lg">
                     Total Ventas:
                   </span>
-                  <span className="text-2xl font-bold text-white">
+                  <span className="text-base md:text-2xl font-bold text-white tabular-nums">
                     {formatCurrency(summary.totalSales)}
                   </span>
                 </div>
@@ -314,21 +314,17 @@ export function CloseRegisterForm({ onSuccess, onCancel }: CloseRegisterFormProp
           </div>
 
           {/* Efectivo esperado */}
-          <div className="rounded-xl border border-blue-500/20 bg-blue-500/10 p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-bold text-blue-400 text-lg">
-                  Efectivo Esperado en Caja
-                </p>
-                <p className="text-sm text-blue-300 mt-1">
-                  Monto Inicial + Ventas en Efectivo
-                </p>
-              </div>
-              <div className="text-right">
-                <span className="text-3xl font-bold text-blue-300">
-                  {formatCurrency(expectedCash)}
-                </span>
-              </div>
+          <div className="rounded-xl border border-blue-500/20 bg-blue-500/10 p-3 md:p-5">
+            <div className="flex flex-col gap-1">
+              <p className="font-bold text-blue-400 text-sm md:text-lg">
+                Efectivo Esperado
+              </p>
+              <p className="text-[10px] md:text-sm text-blue-300">
+                Inicial + Efectivo
+              </p>
+              <span className="text-lg md:text-3xl font-bold text-blue-300 tabular-nums mt-1">
+                {formatCurrency(expectedCash)}
+              </span>
             </div>
           </div>
 
@@ -359,7 +355,7 @@ export function CloseRegisterForm({ onSuccess, onCancel }: CloseRegisterFormProp
           {/* Diferencia */}
           {finalAmount && (
             <div
-              className={`rounded-xl border p-5 ${
+              className={`rounded-xl border p-3 md:p-5 ${
                 difference === 0
                   ? 'bg-emerald-500/10 border-emerald-500/20'
                   : difference > 0
@@ -367,12 +363,12 @@ export function CloseRegisterForm({ onSuccess, onCancel }: CloseRegisterFormProp
                   : 'bg-rose-500/10 border-rose-500/20'
               }`}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className={`rounded-lg p-2 mr-3 ${
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center min-w-0">
+                  <div className={`rounded-lg p-1.5 md:p-2 mr-2 md:mr-3 flex-shrink-0 ${
                     difference === 0 ? 'bg-emerald-500' : difference > 0 ? 'bg-amber-500' : 'bg-rose-500'
                   }`}>
-                    <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="h-4 w-4 md:h-5 md:w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       {difference === 0 ? (
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       ) : difference > 0 ? (
@@ -382,24 +378,22 @@ export function CloseRegisterForm({ onSuccess, onCancel }: CloseRegisterFormProp
                       )}
                     </svg>
                   </div>
-                  <div>
-                    <p
-                      className={`font-bold text-lg ${
-                        difference === 0
-                          ? 'text-emerald-400'
-                          : difference > 0
-                          ? 'text-amber-400'
-                          : 'text-rose-400'
-                      }`}
-                    >
-                      {difference === 0 && 'Cuadra Perfectamente'}
-                      {difference > 0 && 'Sobrante'}
-                      {difference < 0 && 'Faltante'}
-                    </p>
-                  </div>
+                  <p
+                    className={`font-bold text-sm md:text-lg truncate ${
+                      difference === 0
+                        ? 'text-emerald-400'
+                        : difference > 0
+                        ? 'text-amber-400'
+                        : 'text-rose-400'
+                    }`}
+                  >
+                    {difference === 0 && 'Cuadra'}
+                    {difference > 0 && 'Sobrante'}
+                    {difference < 0 && 'Faltante'}
+                  </p>
                 </div>
                 <span
-                  className={`text-3xl font-bold ${
+                  className={`text-base md:text-2xl font-bold tabular-nums flex-shrink-0 ${
                     difference === 0
                       ? 'text-emerald-400'
                       : difference > 0
@@ -429,30 +423,34 @@ export function CloseRegisterForm({ onSuccess, onCancel }: CloseRegisterFormProp
           </div>
 
           {/* Botones */}
-          <div className="flex space-x-4 pt-2">
+          <div className="flex gap-2 md:gap-4 pt-2">
             <button
               type="button"
               onClick={onCancel}
               disabled={isSubmitting}
-              className="flex-1 rounded-xl bg-white/5 px-6 py-3 font-bold text-white border border-white/10 transition-all hover:bg-white/10 disabled:opacity-50"
+              className="flex-1 rounded-xl bg-white/5 px-3 md:px-6 py-2.5 md:py-3 font-bold text-sm md:text-base text-white border border-white/10 transition-all hover:bg-white/10 disabled:opacity-50"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 px-6 py-3 font-bold text-white shadow-lg shadow-rose-500/30 transition-all hover:shadow-xl hover:shadow-rose-500/40 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
+              className="flex-1 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 px-3 md:px-6 py-2.5 md:py-3 font-bold text-sm md:text-base text-white shadow-lg shadow-rose-500/30 transition-all hover:shadow-xl hover:shadow-rose-500/40 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
             >
               {isSubmitting ? (
                 <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 md:h-5 md:w-5 text-white" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Cerrando caja...
+                  <span className="hidden md:inline">Cerrando...</span>
+                  <span className="md:hidden">...</span>
                 </span>
               ) : (
-                'Cerrar Caja y Finalizar Turno'
+                <>
+                  <span className="hidden md:inline">Cerrar Caja</span>
+                  <span className="md:hidden">Cerrar</span>
+                </>
               )}
             </button>
           </div>

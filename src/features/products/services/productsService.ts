@@ -118,11 +118,15 @@ class ProductsService {
         code: input.code,
         name: input.name,
         category: input.category || null,
+        category_id: input.categoryId || null,
         cost: input.cost,
         price: input.price,
         stock: input.stock,
         min_stock: input.minStock || 10,
         tax_rate: input.taxRate || 13,
+        cabys_code: input.cabysCode || null,
+        unit_measure: input.unitMeasure || 'Unid',
+        commercial_code: input.commercialCode || null,
         created_at: now,
         updated_at: now,
       };
@@ -155,11 +159,15 @@ class ProductsService {
       if (input.code !== undefined) updates.code = input.code;
       if (input.name !== undefined) updates.name = input.name;
       if (input.category !== undefined) updates.category = input.category;
+      if (input.categoryId !== undefined) updates.category_id = input.categoryId;
       if (input.cost !== undefined) updates.cost = input.cost;
       if (input.price !== undefined) updates.price = input.price;
       if (input.stock !== undefined) updates.stock = input.stock;
       if (input.minStock !== undefined) updates.min_stock = input.minStock;
       if (input.taxRate !== undefined) updates.tax_rate = input.taxRate;
+      if (input.cabysCode !== undefined) updates.cabys_code = input.cabysCode;
+      if (input.unitMeasure !== undefined) updates.unit_measure = input.unitMeasure;
+      if (input.commercialCode !== undefined) updates.commercial_code = input.commercialCode;
 
       // Usar databaseAdapter para manejar online/offline automáticamente
       await databaseAdapter.update('products', input.id, updates);
@@ -370,11 +378,15 @@ class ProductsService {
       code: data.code,
       name: data.name,
       category: data.category,
+      categoryId: data.category_id || data.categoryId,
       cost: parseFloat(data.cost) || 0,
       price: parseFloat(data.price) || 0,
       stock: data.stock,
       minStock: data.min_stock || data.minStock,
       taxRate: parseFloat(data.tax_rate || data.taxRate) || 13,
+      cabysCode: data.cabys_code || data.cabysCode,
+      unitMeasure: data.unit_measure || data.unitMeasure || 'Unid',
+      commercialCode: data.commercial_code || data.commercialCode,
       createdAt: data.created_at || data.createdAt,
       updatedAt: data.updated_at || data.updatedAt,
     };

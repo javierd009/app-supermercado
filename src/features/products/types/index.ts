@@ -3,6 +3,7 @@ export interface Product {
   code: string;  // Código de barras o código interno
   name: string;
   category?: string;
+  categoryId?: string;  // FK a tabla categories
   cost: number;
   price: number;
   stock: number;
@@ -20,6 +21,7 @@ export interface CreateProductInput {
   code: string;
   name: string;
   category?: string;
+  categoryId?: string;  // FK a tabla categories
   cost: number;
   price: number;
   stock: number;

@@ -5,6 +5,7 @@ import { Button } from '@/shared/components/Button';
 import { Input } from '@/shared/components/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/Card';
 import { useCreateProduct, useUpdateProduct } from '../hooks/useProducts';
+import { useCategories } from '../hooks/useCategories';
 import type { Product } from '../types';
 import { TaxRateSelector } from '@/features/tax/components/TaxRateSelector';
 import { calculateTaxFromTotal, calculateTaxFromSubtotal } from '@/features/tax/utils/taxCalculations';
@@ -19,11 +20,13 @@ interface ProductFormProps {
 export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) {
   const { createProduct } = useCreateProduct();
   const { updateProduct } = useUpdateProduct();
+  const { categories, isLoading: categoriesLoading } = useCategories();
 
   const [formData, setFormData] = useState({
     code: '',
     name: '',
     category: '',
+    categoryId: '', // ID de la categoría seleccionada
     cost: '',
     price: '',
     stock: '',
@@ -48,6 +51,7 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
         code: product.code,
         name: product.name,
         category: product.category || '',
+        categoryId: product.categoryId || '',
         cost: product.cost.toString(),
         price: product.price.toString(),
         stock: product.stock.toString(),
@@ -80,6 +84,33 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
       cabysCode: result.codigo,
       taxRate: result.impuesto, // Asignar IVA automáticamente del catálogo oficial
     }));
+  };
+
+  // Manejar cambio de categoría - auto-poblar CABYS y tasa de IVA
+  const handleCategoryChange = (categoryId: string) => {
+    const selectedCategory = categories.find(c => c.id === categoryId);
+    if (selectedCategory) {
+      setFormData((prev) => ({
+        ...prev,
+        categoryId: categoryId,
+        category: selectedCategory.name,
+        // Auto-poblar CABYS si la categoría tiene uno definido
+        cabysCode: selectedCategory.cabysCode || prev.cabysCode,
+        // Auto-poblar tasa de IVA de la categoría
+        taxRate: selectedCategory.taxRate || prev.taxRate,
+      }));
+      // Mostrar campos de FE si la categoría tiene CABYS
+      if (selectedCategory.cabysCode) {
+        setShowFEFields(true);
+      }
+    } else {
+      // Si no hay categoría seleccionada
+      setFormData((prev) => ({
+        ...prev,
+        categoryId: '',
+        category: '',
+      }));
+    }
   };
 
   const validate = (): boolean => {
@@ -134,6 +165,7 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
         code: formData.code.trim().toUpperCase(),
         name: formData.name.trim(),
         category: formData.category.trim() || undefined,
+        categoryId: formData.categoryId || undefined,
         cost: parseFloat(formData.cost),
         price: finalPrice,  // Siempre guardar precio CON IVA en BD
         stock: parseInt(formData.stock, 10),
@@ -255,14 +287,26 @@ export function ProductForm({ product, onSuccess, onCancel }: ProductFormProps) 
 
           <div className="space-y-2">
             <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide">Categoría</label>
-            <input
-              type="text"
-              placeholder="Ej: Bebidas"
-              value={formData.category}
-              onChange={(e) => handleChange('category', e.target.value)}
-              disabled={isSubmitting}
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-slate-500 transition-all focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:opacity-50"
-            />
+            <select
+              value={formData.categoryId}
+              onChange={(e) => handleCategoryChange(e.target.value)}
+              disabled={isSubmitting || categoriesLoading}
+              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white transition-all focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:opacity-50"
+            >
+              <option value="" className="bg-slate-800">Seleccionar categoría...</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id} className="bg-slate-800">
+                  {cat.name} {cat.cabysCode ? `(CABYS: ${cat.cabysCode.substring(0, 8)}...)` : ''}
+                </option>
+              ))}
+            </select>
+            {formData.categoryId && (
+              <p className="text-xs text-emerald-400">
+                {categories.find(c => c.id === formData.categoryId)?.cabysCode
+                  ? '✓ CABYS y tasa de IVA aplicados automáticamente'
+                  : 'Categoría sin CABYS predefinido'}
+              </p>
+            )}
           </div>
 
           <div className="grid gap-5 md:gap-6 md:grid-cols-2">

@@ -21,7 +21,8 @@ import {
   ArrowLeft,
   Home,
   Clock,
-  LogOut
+  LogOut,
+  Folder
 } from 'lucide-react';
 
 type View = 'list' | 'create' | 'edit' | 'import';
@@ -191,6 +192,12 @@ export default function ProductsPage() {
 
               {(user?.role === 'admin' || user?.role === 'super_admin') && (
                 <>
+                  <Link href="/products/categories">
+                    <button className="bg-white/5 hover:bg-purple-500/20 px-2.5 md:px-4 py-2.5 md:py-2 rounded-xl text-purple-400 font-bold text-xs uppercase tracking-wide transition-all border border-white/5 flex items-center gap-1.5 md:gap-2">
+                      <Folder className="w-4 h-4 md:w-3.5 md:h-3.5" />
+                      <span className="hidden sm:inline">Categorías</span>
+                    </button>
+                  </Link>
                   <button
                     onClick={handleImport}
                     className="bg-blue-600 hover:bg-blue-700 px-3 md:px-4 py-2.5 md:py-2 rounded-xl text-white font-bold text-sm md:text-xs uppercase tracking-wide transition-all flex items-center gap-1.5 md:gap-2 shadow-lg shadow-blue-500/20"

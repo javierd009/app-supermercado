@@ -31,6 +31,7 @@ export async function getSalesReportAction(
     console.log(`[getSalesReportAction] Buscando ventas desde ${startDate} hasta ${endDate}`);
 
     // Primero obtener las ventas con sus relaciones (excluyendo canceladas)
+    // Nota: Usamos users!user_id para especificar la FK correcta (hay múltiples: user_id y canceled_by)
     const { data: sales, error: salesError } = await supabase
       .from('sales')
       .select(`
@@ -40,7 +41,7 @@ export async function getSalesReportAction(
         total,
         user_id,
         customer_id,
-        users (username),
+        users!user_id (username),
         customers (name)
       `)
       .gte('created_at', startDate)

@@ -142,17 +142,17 @@ export function RegisterStatus() {
         <div className="space-y-3">
           <h4 className="text-[9px] font-bold text-blue-400 uppercase tracking-wide">Montos</h4>
           <div className="space-y-2 text-sm">
-            <div className="flex justify-between bg-white/5 p-3 rounded-lg border border-white/5">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-1 bg-white/5 p-3 rounded-lg border border-white/5">
               <span className="text-slate-500 font-medium">Monto Inicial:</span>
-              <span className="font-black text-white">{formatCurrency(currentRegister.initialAmount)}</span>
+              <span className="font-black text-white tabular-nums text-right">{formatCurrency(currentRegister.initialAmount)}</span>
             </div>
-            <div className="flex justify-between bg-white/5 p-3 rounded-lg border border-white/5">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-1 bg-white/5 p-3 rounded-lg border border-white/5">
               <span className="text-slate-500 font-medium">Total Recaudado:</span>
-              <span className="font-black text-emerald-400">{summary ? formatCurrency(summary.totalCash + summary.totalCard + summary.totalSinpe) : '₡0.00'}</span>
+              <span className="font-black text-emerald-400 tabular-nums text-right">{summary ? formatCurrency(summary.totalCash + summary.totalCard + summary.totalSinpe) : '₡0.00'}</span>
             </div>
-            <div className="flex justify-between bg-white/5 p-3 rounded-lg border border-white/5">
+            <div className="flex flex-col sm:flex-row sm:justify-between gap-1 bg-white/5 p-3 rounded-lg border border-white/5">
               <span className="text-slate-500 font-medium">Efectivo Actual:</span>
-              <span className="font-black text-white">{summary ? formatCurrency(currentRegister.initialAmount + summary.totalCash) : formatCurrency(currentRegister.initialAmount)}</span>
+              <span className="font-black text-white tabular-nums text-right">{summary ? formatCurrency(currentRegister.initialAmount + summary.totalCash) : formatCurrency(currentRegister.initialAmount)}</span>
             </div>
           </div>
         </div>
