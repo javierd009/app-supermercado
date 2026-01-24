@@ -4,6 +4,8 @@ import './globals.css'
 import { ConnectionStatus } from '@/shared/components/ConnectionStatus'
 import { RealtimeSyncProvider } from '@/lib/database/RealtimeSyncProvider'
 import { PWARegister } from '@/lib/pwa/PWARegister'
+import { DialogProvider } from '@/shared/components/ConfirmDialog'
+import { ElectronClassManager } from '@/shared/components/ElectronClassManager'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -60,11 +62,14 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
       </head>
       <body className={inter.className}>
+        <ElectronClassManager />
         <PWARegister />
-        <RealtimeSyncProvider>
-          {children}
-          <ConnectionStatus />
-        </RealtimeSyncProvider>
+        <DialogProvider>
+          <RealtimeSyncProvider>
+            {children}
+            <ConnectionStatus />
+          </RealtimeSyncProvider>
+        </DialogProvider>
       </body>
     </html>
   )

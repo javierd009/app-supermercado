@@ -8,7 +8,8 @@
     "dev": "next dev",
     "dev:electron": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && NODE_ENV=development electron .\"",
     "build": "next build",
-    "build:electron": "npm run build && electron-builder",
+    "build:electron": "BUILD_TARGET=electron next build && npm run build:electron:copy && electron-builder",
+    "build:electron:copy": "node scripts/copy-standalone.js",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
@@ -64,24 +65,31 @@
     },
     "files": [
       "electron/**/*",
-      ".next/**/*",
-      "node_modules/**/*",
-      "package.json"
+      ".next/standalone/**/*",
+      ".next/static/**/*",
+      "public/**/*",
+      "package.json",
+      ".env.local"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "**/*.node",
+      "**/node_modules/better-sqlite3/**/*"
     ],
     "win": {
       "target": "nsis",
-      "icon": "electron/icon-256.png"
+      "icon": "electron/icon.ico"
     },
     "mac": {
       "target": "dmg",
-      "icon": "electron/icon-256.png"
+      "icon": "electron/icon.png"
     },
     "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "installerIcon": "electron/icon-256.png",
-      "uninstallerIcon": "electron/icon-256.png",
-      "installerHeaderIcon": "electron/icon-256.png",
+      "oneClick": true,
+      "perMachine": true,
+      "allowElevation": true,
+      "installerIcon": "electron/icon.ico",
+      "uninstallerIcon": "electron/icon.ico",
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "Sabrosita POS"

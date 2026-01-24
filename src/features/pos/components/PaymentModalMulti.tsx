@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { usePOSWindow, useProcessPayment } from '../hooks/usePOSWindow';
 import { useCashRegister } from '@/features/cash-register/hooks/useCashRegister';
+import { useDialog } from '@/shared/components/ConfirmDialog';
 import type { PaymentMethod } from '../types';
 
 interface PaymentModalMultiProps {
@@ -13,6 +14,7 @@ export function PaymentModalMulti({ windowId }: PaymentModalMultiProps) {
   const { cart, isPaymentModalOpen, closePaymentModal } = usePOSWindow(windowId);
   const { processPayment } = useProcessPayment(windowId);
   const { currentRegister } = useCashRegister();
+  const dialog = useDialog();
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cash');
   const [paymentCurrency, setPaymentCurrency] = useState<'CRC' | 'USD'>('CRC');
@@ -57,7 +59,7 @@ export function PaymentModalMulti({ windowId }: PaymentModalMultiProps) {
     const amount = parseFloat(amountReceived);
 
     if (isNaN(amount) || amount < cart.total) {
-      alert('Monto inválido o insuficiente');
+      await dialog.error('Monto inválido o insuficiente', 'Error de Pago');
       return;
     }
 
@@ -82,16 +84,17 @@ export function PaymentModalMulti({ windowId }: PaymentModalMultiProps) {
 
     if (result.success) {
       // Mostrar cambio si es efectivo (siempre en colones)
-      if (paymentMethod === 'cash' && result.change > 0) {
-        let message = `Venta completada.\n\nCambio: ${formatCurrency(result.change)}`;
+      const change = result.change ?? 0;
+      if (paymentMethod === 'cash' && change > 0) {
+        let message = `Cambio a devolver: ${formatCurrency(change)}`;
 
         if (paymentCurrency === 'USD') {
-          message = `Venta completada.\n\nPagó: $${parseFloat(amountReceivedUsd).toFixed(2)} (${formatCurrency(amount)})\nCambio: ${formatCurrency(result.change)} (en colones)`;
+          message = `Pagó: $${parseFloat(amountReceivedUsd).toFixed(2)} (${formatCurrency(amount)})\nCambio: ${formatCurrency(change)} (en colones)`;
         }
 
-        alert(message);
+        await dialog.success(message, 'Venta Completada');
       } else {
-        alert('Venta completada exitosamente');
+        await dialog.success('La venta se ha procesado correctamente', 'Venta Completada');
       }
 
       // Resetear formulario

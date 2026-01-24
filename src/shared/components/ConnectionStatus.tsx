@@ -1,23 +1,24 @@
 /**
  * ConnectionStatus
  * Muestra estado de conexión y cola de sincronización
+ * Diseño compacto: círculo pequeño con nube
  */
 
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useDatabase } from '@/lib/database/useDatabase';
-import { Wifi, WifiOff, Database, Cloud, AlertCircle } from 'lucide-react';
+import { Cloud, CloudOff, Loader2, Check, X, AlertTriangle } from 'lucide-react';
 
 export function ConnectionStatus() {
-  const { isOnline, isElectron, currentDatabase, syncQueueStatus, syncBidirectional, resetQueue } = useDatabase();
+  const { isOnline, isElectron, syncQueueStatus, syncBidirectional, resetQueue } = useDatabase();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState<Date | null>(null);
   const [syncMessage, setSyncMessage] = useState<string>('');
+  const [showConfirm, setShowConfirm] = useState(false);
 
-  // Evitar hidratation mismatch - solo renderizar después del montaje
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -30,16 +31,12 @@ export function ConnectionStatus() {
       try {
         await syncBidirectional();
         setLastSyncTime(new Date());
-        console.log('[ConnectionStatus] ✓ Sincronización automática completada');
       } catch (error) {
         console.error('[ConnectionStatus] Error en auto-sincronización:', error);
       }
     };
 
-    // Sincronizar al montar
     autoSync();
-
-    // Sincronizar cada 5 minutos
     const interval = setInterval(autoSync, 5 * 60 * 1000);
 
     return () => clearInterval(interval);
@@ -47,40 +44,38 @@ export function ConnectionStatus() {
 
   const handleSync = async () => {
     setIsSyncing(true);
-    setSyncMessage('Sincronizando...');
+    setSyncMessage('');
     try {
       await syncBidirectional();
       setLastSyncTime(new Date());
-      setSyncMessage('✓ Sincronización completada exitosamente');
-      setTimeout(() => setSyncMessage(''), 3000);
+      setSyncMessage('ok');
+      setTimeout(() => setSyncMessage(''), 2000);
     } catch (error) {
-      setSyncMessage('✗ Error en sincronización');
-      setTimeout(() => setSyncMessage(''), 3000);
+      setSyncMessage('error');
+      setTimeout(() => setSyncMessage(''), 2000);
     } finally {
       setIsSyncing(false);
     }
   };
 
-  const handleResetQueue = async () => {
-    if (!confirm('¿Estás seguro de limpiar toda la cola de sincronización? Los cambios pendientes se perderán.')) {
-      return;
-    }
+  const handleResetQueue = () => {
+    setShowConfirm(true);
+  };
 
+  const confirmReset = async () => {
+    setShowConfirm(false);
     try {
       await resetQueue();
-      setSyncMessage('✓ Cola limpiada exitosamente');
-      setTimeout(() => setSyncMessage(''), 3000);
+      setSyncMessage('ok');
+      setTimeout(() => setSyncMessage(''), 2000);
     } catch (error) {
-      setSyncMessage('✗ Error al limpiar cola');
-      setTimeout(() => setSyncMessage(''), 3000);
+      setSyncMessage('error');
+      setTimeout(() => setSyncMessage(''), 2000);
     }
   };
 
-  // IMPORTANTE: Retornar el mismo HTML en servidor y cliente para evitar hydration mismatch
-  // Solo ocultar con CSS en vez de retornar null
   const shouldShow = isMounted && isElectron;
 
-  // Si no debemos mostrar, retornar un div invisible para evitar hydration error
   if (!shouldShow) {
     return <div className="hidden" aria-hidden="true" />;
   }
@@ -88,124 +83,172 @@ export function ConnectionStatus() {
   const hasPending = syncQueueStatus.pending > 0;
   const hasFailed = syncQueueStatus.failed > 0;
 
+  // Determinar el estado del ícono
+  const getIconState = () => {
+    if (isSyncing) return 'syncing';
+    if (syncMessage === 'ok') return 'success';
+    if (syncMessage === 'error' || hasFailed) return 'error';
+    if (hasPending) return 'pending';
+    return 'idle';
+  };
+
+  const iconState = getIconState();
+
+  // Colores según estado
+  const getButtonStyles = () => {
+    switch (iconState) {
+      case 'syncing':
+        return 'bg-blue-500/30 border-blue-400/50 text-blue-400';
+      case 'success':
+        return 'bg-emerald-500/30 border-emerald-400/50 text-emerald-400';
+      case 'error':
+        return 'bg-red-500/30 border-red-400/50 text-red-400';
+      case 'pending':
+        return 'bg-amber-500/30 border-amber-400/50 text-amber-400';
+      default:
+        return 'bg-slate-700/50 border-slate-600/50 text-slate-400 hover:bg-slate-600/50';
+    }
+  };
+
   return (
-    <div className="fixed bottom-4 right-4 z-50">
-      {/* Botón compacto */}
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-xl border shadow-lg transition-all bg-blue-500/20 border-blue-500/40 text-blue-400 hover:bg-blue-500/30"
-      >
-        <Cloud className="w-4 h-4" />
-        <span className="text-sm font-medium">Sincronización</span>
-        {hasPending && (
-          <span className="flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-blue-500 rounded-full">
-            {syncQueueStatus.pending}
-          </span>
-        )}
-      </button>
+    <>
+      <div className="fixed bottom-4 right-4 z-50">
+        {/* Botón circular compacto */}
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className={`relative flex items-center justify-center w-10 h-10 rounded-full border backdrop-blur-xl shadow-lg transition-all ${getButtonStyles()}`}
+          title="Sincronización"
+        >
+          {isSyncing ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : syncMessage === 'ok' ? (
+            <Check className="w-5 h-5" />
+          ) : syncMessage === 'error' ? (
+            <X className="w-5 h-5" />
+          ) : isOnline ? (
+            <Cloud className="w-5 h-5" />
+          ) : (
+            <CloudOff className="w-5 h-5" />
+          )}
 
-      {/* Panel expandido */}
-      {isExpanded && (
-        <div className="absolute bottom-14 right-0 w-80 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl p-4">
-          {/* Título */}
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-white">
-              Estado de Base de Datos
-            </h3>
-            <button
-              onClick={() => setIsExpanded(false)}
-              className="text-white/60 hover:text-white"
-            >
-              ✕
-            </button>
-          </div>
+          {/* Badge de pendientes */}
+          {hasPending && !isSyncing && !syncMessage && (
+            <span className="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 text-[10px] font-bold text-white bg-amber-500 rounded-full">
+              {syncQueueStatus.pending > 9 ? '9+' : syncQueueStatus.pending}
+            </span>
+          )}
 
-          {/* Estado de conexión */}
-          <div className="flex items-center gap-3 p-3 bg-white/5 rounded-lg mb-3">
-            <Database className="w-5 h-5 text-emerald-400" />
-            <div className="flex-1">
-              <div className="text-sm font-medium text-white">Modo Híbrido</div>
-              <div className="text-xs text-white/60">
-                SQLite local + Supabase en la nube
+          {/* Badge de errores */}
+          {hasFailed && !hasPending && !isSyncing && !syncMessage && (
+            <span className="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 text-[10px] font-bold text-white bg-red-500 rounded-full">
+              !
+            </span>
+          )}
+        </button>
+
+        {/* Panel expandido */}
+        {isExpanded && (
+          <div className="absolute bottom-12 right-0 w-64 bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl p-3">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Cloud className="w-4 h-4 text-blue-400" />
+                <span className="text-xs font-semibold text-white">Sincronización</span>
               </div>
-            </div>
-          </div>
-
-          {/* Cola de sincronización */}
-          <div className="space-y-2 mb-3">
-            <div className="flex items-center justify-between py-2 border-b border-white/10">
-              <span className="text-sm text-white/80">Pendientes:</span>
-              <span className={`text-sm font-semibold ${hasPending ? 'text-blue-400' : 'text-white/60'}`}>
-                {syncQueueStatus.pending}
-              </span>
+              <button
+                onClick={() => setIsExpanded(false)}
+                className="text-white/40 hover:text-white text-xs"
+              >
+                ✕
+              </button>
             </div>
 
-            <div className="flex items-center justify-between py-2 border-b border-white/10">
-              <span className="text-sm text-white/80">Sincronizados:</span>
-              <span className="text-sm font-semibold text-emerald-400">
-                {syncQueueStatus.synced}
-              </span>
-            </div>
-
-            {hasFailed && (
-              <div className="flex items-center justify-between py-2 border-b border-white/10">
-                <span className="text-sm text-white/80">Errores:</span>
-                <span className="text-sm font-semibold text-red-400">
-                  {syncQueueStatus.failed}
+            {/* Estado */}
+            <div className="grid grid-cols-2 gap-2 mb-3 text-xs">
+              <div className="flex items-center justify-between p-2 bg-white/5 rounded-lg">
+                <span className="text-white/60">Pendientes</span>
+                <span className={`font-semibold ${hasPending ? 'text-amber-400' : 'text-white/40'}`}>
+                  {syncQueueStatus.pending}
                 </span>
               </div>
-            )}
-          </div>
+              <div className="flex items-center justify-between p-2 bg-white/5 rounded-lg">
+                <span className="text-white/60">Sincronizados</span>
+                <span className="font-semibold text-emerald-400">
+                  {syncQueueStatus.synced}
+                </span>
+              </div>
+            </div>
 
-          {/* Botones de sincronización */}
-          <div className="space-y-2">
+            {/* Errores si hay */}
+            {hasFailed && (
+              <div className="flex items-center justify-between p-2 mb-3 bg-red-500/10 border border-red-500/30 rounded-lg text-xs">
+                <span className="text-red-400">Errores: {syncQueueStatus.failed}</span>
+                <button
+                  onClick={handleResetQueue}
+                  className="text-red-300 hover:text-red-200 underline"
+                >
+                  Limpiar
+                </button>
+              </div>
+            )}
+
+            {/* Botón sincronizar */}
             <button
               onClick={handleSync}
               disabled={isSyncing}
-              className={`w-full py-2 rounded-lg font-medium transition-all ${
+              className={`w-full py-2 rounded-lg text-xs font-medium transition-all ${
                 isSyncing
                   ? 'bg-white/10 text-white/40 cursor-not-allowed'
                   : 'bg-blue-500 hover:bg-blue-600 text-white'
               }`}
             >
-              {isSyncing ? 'Sincronizando...' : '🔄 Sincronizar Ahora'}
+              {isSyncing ? 'Sincronizando...' : 'Sincronizar ahora'}
             </button>
 
-            {/* Botón para limpiar cola (solo si hay errores) */}
-            {hasFailed && (
-              <button
-                onClick={handleResetQueue}
-                className="w-full py-2 rounded-lg font-medium transition-all bg-red-500/20 border border-red-500/40 text-red-400 hover:bg-red-500/30 text-xs"
-              >
-                🗑️ Limpiar Cola de Errores
-              </button>
+            {/* Última sincronización */}
+            {lastSyncTime && (
+              <div className="mt-2 text-[10px] text-center text-white/40">
+                Última: {lastSyncTime.toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit' })}
+              </div>
             )}
           </div>
+        )}
+      </div>
 
-          {/* Mensaje de sincronización */}
-          {syncMessage && (
-            <div className={`mt-2 p-2 rounded-lg text-xs text-center ${
-              syncMessage.includes('✓') ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'
-            }`}>
-              {syncMessage}
+      {/* Diálogo de confirmación personalizado */}
+      {showConfirm && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowConfirm(false)}
+          />
+          <div className="relative bg-slate-900 border border-white/10 rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden">
+            <div className="p-4 border-b border-white/10">
+              <h3 className="text-base font-semibold text-white">Confirmar</h3>
             </div>
-          )}
-
-          {/* Última sincronización */}
-          {lastSyncTime && (
-            <div className="mt-2 text-xs text-center text-white/60">
-              Última sync: {lastSyncTime.toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit' })}
+            <div className="p-6 flex flex-col items-center text-center">
+              <AlertTriangle className="w-12 h-12 text-amber-400" />
+              <p className="mt-4 text-white/80 text-sm">
+                ¿Limpiar cola de sincronización? Los cambios pendientes se perderán.
+              </p>
             </div>
-          )}
-
-          {/* Mensaje informativo */}
-          <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-            <p className="text-xs text-blue-300">
-              ℹ️ Sincronización automática cada 5 minutos. Los cambios locales se suben a la nube y los cambios remotos se descargan automáticamente.
-            </p>
+            <div className="flex gap-3 p-4 border-t border-white/10 bg-white/5">
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="flex-1 py-2 px-4 rounded-xl text-sm font-medium text-white/80 bg-white/10 hover:bg-white/20 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmReset}
+                className="flex-1 py-2 px-4 rounded-xl text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors"
+              >
+                Limpiar
+              </button>
+            </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

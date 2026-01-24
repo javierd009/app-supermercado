@@ -3,11 +3,13 @@
 import { useState } from 'react';
 import { useUpdateExchangeRate, useCashRegister } from '../hooks/useCashRegister';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import { useDialog } from '@/shared/components/ConfirmDialog';
 
 export function ExchangeRateEditor() {
   const { user } = useAuth();
   const { currentRegister } = useCashRegister();
   const { updateExchangeRate } = useUpdateExchangeRate();
+  const dialog = useDialog();
 
   const [isEditing, setIsEditing] = useState(false);
   const [newRate, setNewRate] = useState('');
@@ -41,7 +43,7 @@ export function ExchangeRateEditor() {
     const rate = parseFloat(newRate);
 
     if (isNaN(rate) || rate <= 0) {
-      alert('Tipo de cambio inválido');
+      await dialog.error('El tipo de cambio debe ser un número mayor a cero', 'Tipo de Cambio Inválido');
       return;
     }
 
@@ -52,7 +54,7 @@ export function ExchangeRateEditor() {
     if (result.success) {
       setIsEditing(false);
     } else {
-      alert(result.error || 'Error al actualizar');
+      await dialog.error(result.error || 'No se pudo actualizar el tipo de cambio', 'Error');
     }
 
     setIsSaving(false);

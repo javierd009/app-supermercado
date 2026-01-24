@@ -10,6 +10,7 @@ import { CartTableMulti } from './CartTableMulti';
 import { PaymentModalMulti } from './PaymentModalMulti';
 import { CustomerSelector } from './CustomerSelector';
 import { ExchangeRateEditor } from '@/features/cash-register/components/ExchangeRateEditor';
+import { useDialog } from '@/shared/components/ConfirmDialog';
 import {
   CreditCard,
   Trash2,
@@ -28,6 +29,7 @@ interface POSWindowMultiProps {
 export function POSWindowMulti({ windowId, onClose }: POSWindowMultiProps) {
   const { user } = useAuth();
   useLoadProducts();
+  const dialog = useDialog();
 
   const {
     cart,
@@ -45,6 +47,22 @@ export function POSWindowMulti({ windowId, onClose }: POSWindowMultiProps) {
     syncWithWindowManager();
   }, [syncWithWindowManager]);
 
+  // Función para cancelar venta con confirmación
+  const handleCancelSale = async () => {
+    if (cart.items.length === 0) return;
+
+    const confirmed = await dialog.confirm({
+      title: 'Cancelar Venta',
+      message: '¿Estás seguro de que deseas cancelar la venta actual? Se perderán todos los productos del carrito.',
+      confirmText: 'Sí, cancelar',
+      cancelText: 'No, continuar',
+    });
+
+    if (confirmed) {
+      clearCart();
+    }
+  };
+
   // Atajos de teclado
   useKeyboardShortcuts({
     F9: () => {
@@ -58,11 +76,7 @@ export function POSWindowMulti({ windowId, onClose }: POSWindowMultiProps) {
       }
     },
     Escape: () => {
-      if (cart.items.length > 0) {
-        if (confirm('¿Cancelar venta actual?')) {
-          clearCart();
-        }
-      }
+      handleCancelSale();
     },
   });
 
@@ -82,25 +96,25 @@ export function POSWindowMulti({ windowId, onClose }: POSWindowMultiProps) {
       <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
       {/* Header Minimalista */}
-      <div className="bg-white/5 backdrop-blur-3xl border-b border-white/10 shadow-2xl z-20 relative">
+      <div className="bg-white/5 backdrop-blur-3xl border-b border-white/10 shadow-2xl z-20 relative electron-safe-header">
         <div className="px-3 md:px-6 py-3 md:py-4">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 md:gap-4 min-w-0 flex-1">
               {/* Botón Home en móvil */}
               <Link
                 href="/dashboard"
-                className="md:hidden flex-shrink-0 p-2 bg-gradient-to-br from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 rounded-xl shadow-lg transition-all"
+                className="md:hidden flex-shrink-0 p-2 bg-gradient-to-br from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 rounded-xl shadow-lg transition-all electron-no-drag"
               >
                 <Home className="w-4 h-4 text-white" />
               </Link>
 
               {/* Logo y Título */}
               <div className="flex items-center gap-2 md:gap-3 min-w-0">
-                <div className="hidden md:block bg-white rounded-xl p-1 shadow-lg flex-shrink-0">
+                <div className="hidden md:block bg-white rounded-xl p-1.5 shadow-lg flex-shrink-0">
                   <img
                     src="/images/sabrosita-logo.png"
                     alt="La Sabrosita"
-                    className="h-9 w-9 object-contain"
+                    className="h-11 w-11 object-contain"
                   />
                 </div>
                 <div className="min-w-0">
@@ -175,11 +189,7 @@ export function POSWindowMulti({ windowId, onClose }: POSWindowMultiProps) {
               </button>
 
               <button
-                onClick={() => {
-                  if (cart.items.length > 0 && confirm('¿Cancelar venta actual?')) {
-                    clearCart();
-                  }
-                }}
+                onClick={handleCancelSale}
                 disabled={cart.items.length === 0}
                 className="flex items-center justify-center gap-2 bg-white/10 hover:bg-rose-500/20 border border-white/20 hover:border-rose-500/50 text-white disabled:text-slate-600 font-bold py-4 rounded-xl transition-all active:scale-95"
               >
@@ -248,11 +258,7 @@ export function POSWindowMulti({ windowId, onClose }: POSWindowMultiProps) {
             </button>
 
             <button
-              onClick={() => {
-                if (cart.items.length > 0 && confirm('¿Cancelar venta actual?')) {
-                  clearCart();
-                }
-              }}
+              onClick={handleCancelSale}
               disabled={cart.items.length === 0}
               className="w-full flex items-center justify-center gap-2 text-red-400 hover:text-red-300 font-bold py-3 transition-colors text-sm disabled:opacity-50 bg-red-500/10 hover:bg-red-500/20 rounded-xl border border-red-500/20"
             >

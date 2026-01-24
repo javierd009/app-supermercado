@@ -1,0 +1,50 @@
+ACUERDO DE LICENCIA DE USUARIO FINAL
+SABROSITA POS - SISTEMA DE PUNTO DE VENTA
+
+Por favor lea este acuerdo cuidadosamente antes de instalar el software.
+
+================================================================================
+
+1. ACEPTACION DE TERMINOS
+
+Al instalar y usar Sabrosita POS, usted acepta los terminos de este acuerdo.
+Si no esta de acuerdo, no instale el software.
+
+2. LICENCIA DE USO
+
+Se le otorga una licencia no exclusiva para usar Sabrosita POS en sus
+dispositivos para propositos comerciales legitimos.
+
+3. RESTRICCIONES
+
+- No puede modificar, descompilar o realizar ingenieria inversa del software
+- No puede redistribuir el software sin autorizacion escrita
+- No puede usar el software para actividades ilegales
+
+4. PROPIEDAD INTELECTUAL
+
+Sabrosita POS y todos sus componentes son propiedad de sus desarrolladores.
+El uso del software no transfiere ningun derecho de propiedad.
+
+5. LIMITACION DE RESPONSABILIDAD
+
+El software se proporciona "tal cual" sin garantias de ningun tipo.
+Los desarrolladores no seran responsables por danos derivados del uso
+del software.
+
+6. ACTUALIZACIONES
+
+El desarrollador puede proporcionar actualizaciones que mejoren o modifiquen
+las funcionalidades del software.
+
+7. TERMINACION
+
+Esta licencia termina automaticamente si viola cualquiera de sus terminos.
+
+================================================================================
+
+Copyright (c) 2026 Sabrosita POS
+Todos los derechos reservados.
+
+Al hacer clic en "Acepto" o continuar con la instalacion, usted confirma
+que ha leido y acepta estos terminos.

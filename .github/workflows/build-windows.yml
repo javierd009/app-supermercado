@@ -23,11 +23,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build Next.js
+      - name: Build Next.js with standalone output
         run: npm run build
         env:
+          BUILD_TARGET: electron
           NEXT_PUBLIC_SUPABASE_URL: "https://lkiyyweipmgzcxcnocxs.supabase.co"
           NEXT_PUBLIC_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxraXl5d2VpcG1nemN4Y25vY3hzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg2MjA5NzUsImV4cCI6MjA4NDE5Njk3NX0.vlzqt73Zxl0yoxoyLD4V1vmImU3oonA9njy4d_8bXCg"
+
+      - name: Copy standalone files
+        run: npm run build:electron:copy
 
       - name: Build Windows Installer
         run: npx electron-builder --win

@@ -4,16 +4,69 @@ import { useState, useEffect } from 'react';
 import { salesService } from '@/features/sales/services';
 import { printService } from '@/features/printing/services';
 import { BackToDashboard } from '@/shared/components/BackToDashboard';
+import { useDialog } from '@/shared/components/ConfirmDialog';
+import { Printer, RefreshCw, Check, AlertCircle } from 'lucide-react';
 import type { Sale } from '@/features/sales/types';
+
+interface PrinterInfo {
+  name: string;
+  displayName: string;
+  description: string;
+  status: number;
+  isDefault: boolean;
+}
 
 export default function PrintingPage() {
   const [recentSales, setRecentSales] = useState<Sale[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isPrinting, setIsPrinting] = useState(false);
+  const [printers, setPrinters] = useState<PrinterInfo[]>([]);
+  const [selectedPrinter, setSelectedPrinter] = useState<string | null>(null);
+  const [isLoadingPrinters, setIsLoadingPrinters] = useState(false);
+  const [isElectron, setIsElectron] = useState(false);
+  const dialog = useDialog();
 
   useEffect(() => {
     loadRecentSales();
+    checkElectronAndLoadPrinters();
   }, []);
+
+  const checkElectronAndLoadPrinters = async () => {
+    if (typeof window !== 'undefined' && window.electronAPI?.printer?.list) {
+      setIsElectron(true);
+      await loadPrinters();
+    }
+  };
+
+  const loadPrinters = async () => {
+    if (!window.electronAPI?.printer?.list) return;
+
+    setIsLoadingPrinters(true);
+    try {
+      const result = await window.electronAPI.printer.list();
+      if (result.success) {
+        setPrinters(result.printers || []);
+        setSelectedPrinter(result.selectedPrinter || null);
+      }
+    } catch (error) {
+      console.error('Error loading printers:', error);
+    }
+    setIsLoadingPrinters(false);
+  };
+
+  const handleSelectPrinter = async (printerName: string) => {
+    if (!window.electronAPI?.printer?.select) return;
+
+    try {
+      const result = await window.electronAPI.printer.select(printerName);
+      if (result.success) {
+        setSelectedPrinter(printerName);
+        await dialog.success(`Impresora "${printerName}" seleccionada correctamente`, 'Impresora Configurada');
+      }
+    } catch (error) {
+      await dialog.error('No se pudo seleccionar la impresora', 'Error');
+    }
+  };
 
   const loadRecentSales = async () => {
     setIsLoading(true);
@@ -27,9 +80,9 @@ export default function PrintingPage() {
     const result = await printService.printTestTicket();
 
     if (result.success) {
-      alert('Ticket de prueba enviado a la impresora');
+      await dialog.success('El ticket de prueba se envió a la impresora', 'Impresión Exitosa');
     } else {
-      alert(`Error al imprimir: ${result.error}`);
+      await dialog.error(result.error || 'Error desconocido', 'Error de Impresión');
     }
 
     setIsPrinting(false);
@@ -38,7 +91,7 @@ export default function PrintingPage() {
   const handleReprint = async (saleId: string) => {
     const sale = await salesService.getSaleWithItems(saleId);
     if (!sale) {
-      alert('No se pudo cargar la venta');
+      await dialog.error('No se pudo cargar la información de la venta', 'Error');
       return;
     }
 
@@ -49,9 +102,9 @@ export default function PrintingPage() {
     );
 
     if (result.success) {
-      alert('Ticket reenviado a la impresora');
+      await dialog.success('El ticket se reenvió a la impresora', 'Reimpresión Exitosa');
     } else {
-      alert(`Error al imprimir: ${result.error}`);
+      await dialog.error(result.error || 'Error desconocido', 'Error de Impresión');
     }
   };
 
@@ -85,6 +138,111 @@ export default function PrintingPage() {
             </p>
           </div>
         </div>
+
+        {/* Printer Selection Card - Solo visible en Electron */}
+        {isElectron && (
+          <div className="rounded-2xl bg-white shadow-xl border border-slate-200/60 overflow-hidden mb-8">
+            <div className="border-b border-slate-200 bg-gradient-to-r from-blue-50 to-white px-8 py-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 p-3 shadow-lg shadow-blue-500/30 mr-4">
+                    <Printer className="h-8 w-8 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-slate-900">Seleccionar Impresora</h2>
+                    <p className="text-sm text-slate-600 mt-1">
+                      Elija la impresora térmica para tickets de venta
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={loadPrinters}
+                  disabled={isLoadingPrinters}
+                  className="flex items-center gap-2 rounded-lg bg-slate-100 px-4 py-2 font-semibold text-slate-700 transition-colors hover:bg-slate-200 disabled:opacity-50"
+                >
+                  <RefreshCw className={`h-4 w-4 ${isLoadingPrinters ? 'animate-spin' : ''}`} />
+                  Actualizar
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              {isLoadingPrinters ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
+                  <span className="ml-4 text-slate-600">Cargando impresoras...</span>
+                </div>
+              ) : printers.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="rounded-full bg-slate-100 p-6 mx-auto w-fit mb-4">
+                    <AlertCircle className="h-12 w-12 text-slate-400" />
+                  </div>
+                  <p className="text-lg font-semibold text-slate-600">No se encontraron impresoras</p>
+                  <p className="text-sm text-slate-500 mt-2">
+                    Conecte una impresora y haga clic en "Actualizar"
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {printers.map((printer) => (
+                    <div
+                      key={printer.name}
+                      onClick={() => handleSelectPrinter(printer.name)}
+                      className={`flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                        selectedPrinter === printer.name
+                          ? 'border-emerald-500 bg-emerald-50'
+                          : 'border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className={`rounded-lg p-2 ${
+                          selectedPrinter === printer.name
+                            ? 'bg-emerald-500 text-white'
+                            : 'bg-slate-100 text-slate-600'
+                        }`}>
+                          <Printer className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-slate-900">
+                            {printer.displayName || printer.name}
+                          </p>
+                          <p className="text-xs text-slate-500">
+                            {printer.description || 'Impresora del sistema'}
+                            {printer.isDefault && (
+                              <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700">
+                                Por defecto
+                              </span>
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                      {selectedPrinter === printer.name && (
+                        <div className="flex items-center gap-2 text-emerald-600">
+                          <Check className="h-5 w-5" />
+                          <span className="font-semibold text-sm">Seleccionada</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {selectedPrinter && (
+                <div className="mt-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200">
+                  <div className="flex items-center gap-3">
+                    <Check className="h-5 w-5 text-emerald-600" />
+                    <div>
+                      <p className="font-semibold text-emerald-800">Impresora configurada</p>
+                      <p className="text-sm text-emerald-600">
+                        Los tickets se imprimirán en: <strong>{selectedPrinter}</strong>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Test Print Card */}
         <div className="rounded-2xl bg-white shadow-xl border border-slate-200/60 overflow-hidden mb-8">

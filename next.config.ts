@@ -7,8 +7,8 @@ const nextConfig: NextConfig = {
   },
 
   // Configuración para Electron
-  // Solo exportar estático si estamos construyendo para Electron
-  output: process.env.BUILD_TARGET === 'electron' ? 'export' : undefined,
+  // Usar standalone para crear servidor Node.js mínimo que corre dentro de Electron
+  output: process.env.BUILD_TARGET === 'electron' ? 'standalone' : undefined,
 
   // Deshabilitar optimización de imágenes para build estático
   images: {

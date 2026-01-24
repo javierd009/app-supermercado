@@ -3,12 +3,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/shared/components/Button';
 import { Input } from '@/shared/components/Input';
+import { useDialog } from '@/shared/components/ConfirmDialog';
 import { usePOS, useProcessPayment } from '../hooks/usePOS';
 import type { PaymentMethod } from '../types';
 
 export function PaymentModal() {
   const { cart, isPaymentModalOpen, closePaymentModal } = usePOS();
   const { processPayment } = useProcessPayment();
+  const dialog = useDialog();
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cash');
   const [amountReceived, setAmountReceived] = useState('');
@@ -39,7 +41,7 @@ export function PaymentModal() {
     const amount = parseFloat(amountReceived);
 
     if (isNaN(amount) || amount < cart.total) {
-      alert('Monto inválido o insuficiente');
+      await dialog.error('Monto inválido o insuficiente', 'Error de Pago');
       return;
     }
 
@@ -49,10 +51,11 @@ export function PaymentModal() {
 
     if (result.success) {
       // Mostrar cambio si es efectivo
-      if (paymentMethod === 'cash' && result.change > 0) {
-        alert(`Venta completada.\n\nCambio: ${formatCurrency(result.change)}`);
+      const change = result.change ?? 0;
+      if (paymentMethod === 'cash' && change > 0) {
+        await dialog.success(`Cambio a devolver: ${formatCurrency(change)}`, 'Venta Completada');
       } else {
-        alert('Venta completada exitosamente');
+        await dialog.success('La venta se ha procesado correctamente', 'Venta Completada');
       }
 
       // Resetear formulario

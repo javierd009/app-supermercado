@@ -1,6 +1,7 @@
 'use client';
 
 import { usePOSWindow } from '../hooks/usePOSWindow';
+import { useDialog } from '@/shared/components/ConfirmDialog';
 import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
 
 interface CartTableMultiProps {
@@ -9,6 +10,20 @@ interface CartTableMultiProps {
 
 export function CartTableMulti({ windowId }: CartTableMultiProps) {
   const { items, updateItemQuantity, removeItem, selectedItemId, setSelectedItemId } = usePOSWindow(windowId);
+  const dialog = useDialog();
+
+  const handleRemoveItem = async (itemId: string, itemName: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const confirmed = await dialog.confirm({
+      title: 'Eliminar Producto',
+      message: `¿Deseas eliminar "${itemName}" del carrito?`,
+      confirmText: 'Eliminar',
+      cancelText: 'Cancelar',
+    });
+    if (confirmed) {
+      removeItem(itemId);
+    }
+  };
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-CR', {
@@ -127,12 +142,7 @@ export function CartTableMulti({ windowId }: CartTableMultiProps) {
                   </td>
                   <td className="px-6 py-4 text-center">
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (confirm(`¿Eliminar ${item.name}?`)) {
-                          removeItem(item.id);
-                        }
-                      }}
+                      onClick={(e) => handleRemoveItem(item.id, item.name, e)}
                       className="p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all opacity-0 group-hover:opacity-100"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -178,12 +188,7 @@ export function CartTableMulti({ windowId }: CartTableMultiProps) {
                     </h3>
                   </div>
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (confirm(`¿Eliminar ${item.name}?`)) {
-                        removeItem(item.id);
-                      }
-                    }}
+                    onClick={(e) => handleRemoveItem(item.id, item.name, e)}
                     className="flex-shrink-0 p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all"
                   >
                     <Trash2 className="w-4 h-4" />

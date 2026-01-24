@@ -1,8 +1,14 @@
+'use client';
+
 import Link from 'next/link';
 import { BusinessConfigForm } from '@/features/settings';
-import { Settings, Home, LogOut, ArrowLeft } from 'lucide-react';
+import { useAuth } from '@/features/auth/hooks/useAuth';
+import { Settings, Home, LogOut, ArrowLeft, Activity, Printer } from 'lucide-react';
 
 export default function SettingsPage() {
+  const { user } = useAuth();
+  const isSuperAdmin = user?.role === 'super_admin';
+
   return (
     <div className="min-h-screen bg-[#020617] text-slate-200">
       {/* Header */}
@@ -35,8 +41,42 @@ export default function SettingsPage() {
         </div>
       </header>
 
-      <main className="p-6 md:p-8 max-w-3xl mx-auto">
+      <main className="p-6 md:p-8 max-w-3xl mx-auto space-y-6">
         <BusinessConfigForm />
+
+        {/* Herramientas de Sistema - Solo Super Admin */}
+        {isSuperAdmin && (
+          <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+            <div className="px-6 py-4 border-b border-white/5">
+              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">
+                Herramientas de Sistema
+              </h3>
+            </div>
+            <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Link href="/admin/diagnostics">
+                <div className="flex items-center gap-4 p-4 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 rounded-xl transition-all cursor-pointer group">
+                  <div className="p-3 bg-emerald-500/20 rounded-xl group-hover:scale-110 transition-transform">
+                    <Activity className="w-5 h-5 text-emerald-400" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-white">Diagnósticos</p>
+                    <p className="text-xs text-slate-400">Verificar sistema y logs</p>
+                  </div>
+                </div>
+              </Link>
+
+              <div className="flex items-center gap-4 p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl opacity-60">
+                <div className="p-3 bg-blue-500/20 rounded-xl">
+                  <Printer className="w-5 h-5 text-blue-400" />
+                </div>
+                <div>
+                  <p className="font-bold text-white">Impresora</p>
+                  <p className="text-xs text-slate-400">Configurar en POS</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       <footer className="py-6 px-8 bg-[#020617]/80 backdrop-blur-xl border-t border-white/5 mt-12">

@@ -166,10 +166,10 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-[#020617] text-slate-200">
       {/* Header */}
-      <header className="h-20 px-6 md:px-8 flex items-center justify-between border-b border-white/5 bg-[#020617]/80 backdrop-blur-xl sticky top-0 z-20">
+      <header className="h-20 px-6 md:px-8 flex items-center justify-between border-b border-white/5 bg-[#020617]/80 backdrop-blur-xl sticky top-0 z-20 electron-safe-header">
         <div className="flex items-center gap-4">
-          <div className="bg-white rounded-xl p-1.5 shadow-xl">
-            <img src="/images/sabrosita-logo.png" alt="La Sabrosita" className="h-12 w-12 object-contain" />
+          <div className="bg-white rounded-xl p-2 shadow-xl">
+            <img src="/images/sabrosita-logo.png" alt="La Sabrosita" className="h-14 w-14 object-contain" />
           </div>
           <div>
             <p className="text-xl font-black text-white tracking-tight uppercase">{businessName}</p>

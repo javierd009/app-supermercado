@@ -18,6 +18,9 @@ try {
     // Impresora térmica
     printer: {
       print: (data) => ipcRenderer.invoke('printer:print', data),
+      list: () => ipcRenderer.invoke('printer:list'),
+      select: (printerName) => ipcRenderer.invoke('printer:select', printerName),
+      getSelected: () => ipcRenderer.invoke('printer:getSelected'),
     },
 
     // Scanner de código de barras
@@ -28,9 +31,20 @@ try {
       },
     },
 
-    // Multi-ventana
+    // Multi-ventana y controles de ventana
     window: {
       createNew: () => ipcRenderer.invoke('window:new'),
+      minimize: () => ipcRenderer.invoke('window:minimize'),
+      maximize: () => ipcRenderer.invoke('window:maximize'),
+      close: () => ipcRenderer.invoke('window:close'),
+      isMaximized: () => ipcRenderer.invoke('window:isMaximized'),
+    },
+
+    // Diagnósticos del sistema
+    diagnostics: {
+      run: () => ipcRenderer.invoke('diagnostics:run'),
+      getLogPath: () => ipcRenderer.invoke('diagnostics:getLogPath'),
+      readLog: () => ipcRenderer.invoke('diagnostics:readLog'),
     },
 
     // Información del sistema
